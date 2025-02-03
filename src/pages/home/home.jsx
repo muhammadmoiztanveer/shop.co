@@ -24,6 +24,7 @@ import { generateClient } from "aws-amplify/api";
 import { fetchTopRatedProducts, listReviews } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import ProductCards from "../../components/productCards/productCards";
+import { v4 as uuid } from "uuid";
 
 const HomePage = () => {
   const client = generateClient();
@@ -432,7 +433,7 @@ const HomePage = () => {
                   .fill(0)
                   .map((_, index) => (
                     <div
-                      key={index}
+                      key={uuid()}
                       className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 p-4 animate-pulse"
                     >
                       <div className="border rounded-xl bg-gray-100 p-6 space-y-5">
@@ -442,7 +443,7 @@ const HomePage = () => {
                               .fill(0)
                               .map((_, i) => (
                                 <div
-                                  key={i}
+                                  key={uuid()}
                                   className="h-6 w-6 bg-gray-300 rounded-full"
                                 />
                               ))}
@@ -457,7 +458,7 @@ const HomePage = () => {
                   ))
               : reviewsToDisplay.map((review, index) => (
                   <div
-                    key={review.id || index}
+                    key={uuid()}
                     className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 p-4"
                   >
                     <div className="border rounded-xl flex flex-col p-6 space-y-5">
@@ -465,7 +466,7 @@ const HomePage = () => {
                         <div className="flex gap-1">
                           {[...Array(5)].map((_, i) => (
                             <StarFilled
-                              key={i}
+                              key={uuid()}
                               style={{
                                 color:
                                   i < Math.round(review.rating)

@@ -71,3 +71,7 @@
   > .ant-menu-submenu-arrow {
   color: black !important;
 }
+
+.ant-spin-dot-spin i {
+  color: black !important;
+}

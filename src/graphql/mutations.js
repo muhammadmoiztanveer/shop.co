@@ -212,6 +212,363 @@ export const deleteComment = /* GraphQL */ `
     }
   }
 `;
+export const createProduct = /* GraphQL */ `
+  mutation CreateProduct(
+    $input: CreateProductInput!
+    $condition: ModelProductConditionInput
+  ) {
+    createProduct(input: $input, condition: $condition) {
+      id
+      title
+      description
+      price
+      discountPercentage
+      category
+      brand
+      images
+      sizes
+      colors
+      quantity
+      createdAt
+      updatedAt
+      cartItems {
+        items {
+          id
+          cartID
+          productID
+          product {
+            id
+            title
+            description
+            price
+            discountPercentage
+            category
+            brand
+            images
+            sizes
+            colors
+            quantity
+            createdAt
+            updatedAt
+            cartItems {
+              items {
+                id
+                cartID
+                productID
+                product {
+                  id
+                  title
+                  description
+                  price
+                  discountPercentage
+                  category
+                  brand
+                  images
+                  sizes
+                  colors
+                  quantity
+                  createdAt
+                  updatedAt
+                  cartItems {
+                    items {
+                      id
+                      cartID
+                      productID
+                      product {
+                        id
+                        title
+                        description
+                        price
+                        discountPercentage
+                        category
+                        brand
+                        images
+                        sizes
+                        colors
+                        quantity
+                        createdAt
+                        updatedAt
+                        __typename
+                      }
+                      color
+                      size
+                      quantity
+                      price
+                      createdAt
+                      updatedAt
+                      __typename
+                    }
+                    nextToken
+                    __typename
+                  }
+                  __typename
+                }
+                color
+                size
+                quantity
+                price
+                createdAt
+                updatedAt
+                __typename
+              }
+              nextToken
+              __typename
+            }
+            __typename
+          }
+          color
+          size
+          quantity
+          price
+          createdAt
+          updatedAt
+          __typename
+        }
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const updateProduct = /* GraphQL */ `
+  mutation UpdateProduct(
+    $input: UpdateProductInput!
+    $condition: ModelProductConditionInput
+  ) {
+    updateProduct(input: $input, condition: $condition) {
+      id
+      title
+      description
+      price
+      discountPercentage
+      category
+      brand
+      images
+      sizes
+      colors
+      quantity
+      createdAt
+      updatedAt
+      cartItems {
+        items {
+          id
+          cartID
+          productID
+          product {
+            id
+            title
+            description
+            price
+            discountPercentage
+            category
+            brand
+            images
+            sizes
+            colors
+            quantity
+            createdAt
+            updatedAt
+            cartItems {
+              items {
+                id
+                cartID
+                productID
+                product {
+                  id
+                  title
+                  description
+                  price
+                  discountPercentage
+                  category
+                  brand
+                  images
+                  sizes
+                  colors
+                  quantity
+                  createdAt
+                  updatedAt
+                  cartItems {
+                    items {
+                      id
+                      cartID
+                      productID
+                      product {
+                        id
+                        title
+                        description
+                        price
+                        discountPercentage
+                        category
+                        brand
+                        images
+                        sizes
+                        colors
+                        quantity
+                        createdAt
+                        updatedAt
+                        __typename
+                      }
+                      color
+                      size
+                      quantity
+                      price
+                      createdAt
+                      updatedAt
+                      __typename
+                    }
+                    nextToken
+                    __typename
+                  }
+                  __typename
+                }
+                color
+                size
+                quantity
+                price
+                createdAt
+                updatedAt
+                __typename
+              }
+              nextToken
+              __typename
+            }
+            __typename
+          }
+          color
+          size
+          quantity
+          price
+          createdAt
+          updatedAt
+          __typename
+        }
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const deleteProduct = /* GraphQL */ `
+  mutation DeleteProduct(
+    $input: DeleteProductInput!
+    $condition: ModelProductConditionInput
+  ) {
+    deleteProduct(input: $input, condition: $condition) {
+      id
+      title
+      description
+      price
+      discountPercentage
+      category
+      brand
+      images
+      sizes
+      colors
+      quantity
+      createdAt
+      updatedAt
+      cartItems {
+        items {
+          id
+          cartID
+          productID
+          product {
+            id
+            title
+            description
+            price
+            discountPercentage
+            category
+            brand
+            images
+            sizes
+            colors
+            quantity
+            createdAt
+            updatedAt
+            cartItems {
+              items {
+                id
+                cartID
+                productID
+                product {
+                  id
+                  title
+                  description
+                  price
+                  discountPercentage
+                  category
+                  brand
+                  images
+                  sizes
+                  colors
+                  quantity
+                  createdAt
+                  updatedAt
+                  cartItems {
+                    items {
+                      id
+                      cartID
+                      productID
+                      product {
+                        id
+                        title
+                        description
+                        price
+                        discountPercentage
+                        category
+                        brand
+                        images
+                        sizes
+                        colors
+                        quantity
+                        createdAt
+                        updatedAt
+                        __typename
+                      }
+                      color
+                      size
+                      quantity
+                      price
+                      createdAt
+                      updatedAt
+                      __typename
+                    }
+                    nextToken
+                    __typename
+                  }
+                  __typename
+                }
+                color
+                size
+                quantity
+                price
+                createdAt
+                updatedAt
+                __typename
+              }
+              nextToken
+              __typename
+            }
+            __typename
+          }
+          color
+          size
+          quantity
+          price
+          createdAt
+          updatedAt
+          __typename
+        }
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
 export const createCart = /* GraphQL */ `
   mutation CreateCart(
     $input: CreateCartInput!
@@ -1093,363 +1450,6 @@ export const deleteUser = /* GraphQL */ `
       status
       createdAt
       updatedAt
-      __typename
-    }
-  }
-`;
-export const createProduct = /* GraphQL */ `
-  mutation CreateProduct(
-    $input: CreateProductInput!
-    $condition: ModelProductConditionInput
-  ) {
-    createProduct(input: $input, condition: $condition) {
-      id
-      title
-      description
-      price
-      discountPercentage
-      category
-      brand
-      images
-      sizes
-      colors
-      quantity
-      createdAt
-      updatedAt
-      cartItems {
-        items {
-          id
-          cartID
-          productID
-          product {
-            id
-            title
-            description
-            price
-            discountPercentage
-            category
-            brand
-            images
-            sizes
-            colors
-            quantity
-            createdAt
-            updatedAt
-            cartItems {
-              items {
-                id
-                cartID
-                productID
-                product {
-                  id
-                  title
-                  description
-                  price
-                  discountPercentage
-                  category
-                  brand
-                  images
-                  sizes
-                  colors
-                  quantity
-                  createdAt
-                  updatedAt
-                  cartItems {
-                    items {
-                      id
-                      cartID
-                      productID
-                      product {
-                        id
-                        title
-                        description
-                        price
-                        discountPercentage
-                        category
-                        brand
-                        images
-                        sizes
-                        colors
-                        quantity
-                        createdAt
-                        updatedAt
-                        __typename
-                      }
-                      color
-                      size
-                      quantity
-                      price
-                      createdAt
-                      updatedAt
-                      __typename
-                    }
-                    nextToken
-                    __typename
-                  }
-                  __typename
-                }
-                color
-                size
-                quantity
-                price
-                createdAt
-                updatedAt
-                __typename
-              }
-              nextToken
-              __typename
-            }
-            __typename
-          }
-          color
-          size
-          quantity
-          price
-          createdAt
-          updatedAt
-          __typename
-        }
-        nextToken
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const updateProduct = /* GraphQL */ `
-  mutation UpdateProduct(
-    $input: UpdateProductInput!
-    $condition: ModelProductConditionInput
-  ) {
-    updateProduct(input: $input, condition: $condition) {
-      id
-      title
-      description
-      price
-      discountPercentage
-      category
-      brand
-      images
-      sizes
-      colors
-      quantity
-      createdAt
-      updatedAt
-      cartItems {
-        items {
-          id
-          cartID
-          productID
-          product {
-            id
-            title
-            description
-            price
-            discountPercentage
-            category
-            brand
-            images
-            sizes
-            colors
-            quantity
-            createdAt
-            updatedAt
-            cartItems {
-              items {
-                id
-                cartID
-                productID
-                product {
-                  id
-                  title
-                  description
-                  price
-                  discountPercentage
-                  category
-                  brand
-                  images
-                  sizes
-                  colors
-                  quantity
-                  createdAt
-                  updatedAt
-                  cartItems {
-                    items {
-                      id
-                      cartID
-                      productID
-                      product {
-                        id
-                        title
-                        description
-                        price
-                        discountPercentage
-                        category
-                        brand
-                        images
-                        sizes
-                        colors
-                        quantity
-                        createdAt
-                        updatedAt
-                        __typename
-                      }
-                      color
-                      size
-                      quantity
-                      price
-                      createdAt
-                      updatedAt
-                      __typename
-                    }
-                    nextToken
-                    __typename
-                  }
-                  __typename
-                }
-                color
-                size
-                quantity
-                price
-                createdAt
-                updatedAt
-                __typename
-              }
-              nextToken
-              __typename
-            }
-            __typename
-          }
-          color
-          size
-          quantity
-          price
-          createdAt
-          updatedAt
-          __typename
-        }
-        nextToken
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const deleteProduct = /* GraphQL */ `
-  mutation DeleteProduct(
-    $input: DeleteProductInput!
-    $condition: ModelProductConditionInput
-  ) {
-    deleteProduct(input: $input, condition: $condition) {
-      id
-      title
-      description
-      price
-      discountPercentage
-      category
-      brand
-      images
-      sizes
-      colors
-      quantity
-      createdAt
-      updatedAt
-      cartItems {
-        items {
-          id
-          cartID
-          productID
-          product {
-            id
-            title
-            description
-            price
-            discountPercentage
-            category
-            brand
-            images
-            sizes
-            colors
-            quantity
-            createdAt
-            updatedAt
-            cartItems {
-              items {
-                id
-                cartID
-                productID
-                product {
-                  id
-                  title
-                  description
-                  price
-                  discountPercentage
-                  category
-                  brand
-                  images
-                  sizes
-                  colors
-                  quantity
-                  createdAt
-                  updatedAt
-                  cartItems {
-                    items {
-                      id
-                      cartID
-                      productID
-                      product {
-                        id
-                        title
-                        description
-                        price
-                        discountPercentage
-                        category
-                        brand
-                        images
-                        sizes
-                        colors
-                        quantity
-                        createdAt
-                        updatedAt
-                        __typename
-                      }
-                      color
-                      size
-                      quantity
-                      price
-                      createdAt
-                      updatedAt
-                      __typename
-                    }
-                    nextToken
-                    __typename
-                  }
-                  __typename
-                }
-                color
-                size
-                quantity
-                price
-                createdAt
-                updatedAt
-                __typename
-              }
-              nextToken
-              __typename
-            }
-            __typename
-          }
-          color
-          size
-          quantity
-          price
-          createdAt
-          updatedAt
-          __typename
-        }
-        nextToken
-        __typename
-      }
       __typename
     }
   }

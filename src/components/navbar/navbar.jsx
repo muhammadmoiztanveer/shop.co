@@ -30,6 +30,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { uploadData, getProperties, list } from "aws-amplify/storage";
 import { StorageImage, FileUploader } from "@aws-amplify/ui-react-storage";
+import { v4 as uuid } from "uuid";
 
 const Navbar = () => {
   const client = generateClient();
@@ -62,6 +63,7 @@ const Navbar = () => {
   const [fileList, setFileList] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState({}); // Track upload progress and status for each file
   const [showGlobalSpinner, setShowGlobalSpinner] = useState(false); // Global spinner state
+  const [selectedColors, setSelectedColors] = useState([]);
 
   const dropdownRef = useRef(null);
 
@@ -207,6 +209,7 @@ const Navbar = () => {
       });
       setUploadingFiles({});
       setFileList([]);
+      setSelectedColors([]);
     } catch (errors) {
       if (errors instanceof Yup.ValidationError) {
         // Collect all validation errors
@@ -538,8 +541,6 @@ const Navbar = () => {
     setProductData((prev) => ({ ...prev, title: title }));
   }
 
-  const [selectedColors, setSelectedColors] = useState([]);
-
   useEffect(() => {
     setProduct((prev) => ({ ...prev, colors: selectedColors }));
   }, [selectedColors]);
@@ -709,7 +710,7 @@ const Navbar = () => {
                   >
                     {accountsOptions.map((option) => (
                       <li
-                        key={option.key}
+                        key={uuid()}
                         className="cursor-pointer"
                         role="menuitem"
                       >
@@ -932,8 +933,10 @@ const Navbar = () => {
                 <option value="" disabled>
                   Select a category
                 </option>
-                <option value="top-wear">Top Wear</option>
-                <option value="bottom-wear">Bottom Wear</option>
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="party">Party</option>
+                <option value="gym">Gym</option>
               </select>
               {errors.category && (
                 <span style={{ color: "red", fontSize: "0.875rem" }}>

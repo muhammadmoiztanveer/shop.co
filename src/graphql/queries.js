@@ -308,6 +308,7 @@ export const listProducts = /* GraphQL */ `
         __typename
       }
       nextToken
+      totalCount
       __typename
     }
   }

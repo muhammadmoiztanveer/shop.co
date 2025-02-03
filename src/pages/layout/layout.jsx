@@ -5,6 +5,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { Breadcrumb, Spin } from "antd";
 import { getCurrentUser } from "aws-amplify/auth";
+import { v4 as uuid } from "uuid";
 
 const capitalize = (str) => {
   if (!str) return "";
@@ -45,7 +46,7 @@ const Layout = () => {
     },
     ...pathArray.map((part, index) => ({
       title: (
-        <Link to={`/${pathArray.slice(0, index + 1).join("/")}`}>
+        <Link to={`/${pathArray.slice(0, index + 1).join("/")}`} key={uuid()}>
           {capitalize(part)}
         </Link>
       ),

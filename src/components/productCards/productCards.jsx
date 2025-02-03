@@ -5,6 +5,7 @@ import { StorageImage } from "@aws-amplify/ui-react-storage";
 import { StarFilled, DeleteFilled } from "@ant-design/icons";
 import { generateClient } from "aws-amplify/api";
 import { deleteProduct } from "../../graphql/mutations";
+import { v4 as uuid } from "uuid";
 
 const ProductCards = ({
   loadingNewArrivals,
@@ -21,9 +22,9 @@ const ProductCards = ({
     setProductIdBeingDeleted(`${productId}`);
 
     try {
-      setLoading(true); 
+      setLoading(true);
       const deleteProductResponse = await client.graphql({
-        query: deleteProduct, 
+        query: deleteProduct,
         variables: {
           input: {
             id: `${productId}`,
@@ -50,7 +51,7 @@ const ProductCards = ({
               .fill(0)
               .map((_, index) => (
                 <div
-                  key={index}
+                  key={uuid()}
                   className="flex flex-col space-y-8 animate-pulse w-full"
                 >
                   <div className="bg-gray-300 aspect-square rounded-md w-full"></div>
@@ -76,7 +77,7 @@ const ProductCards = ({
               ))
           : newArrivals.map((product, index) => (
               <div
-                key={product.id + index}
+                key={uuid()}
                 className="flex flex-col space-y-8 cursor-pointer"
                 onClick={() => viewProduct(product.id)}
               >

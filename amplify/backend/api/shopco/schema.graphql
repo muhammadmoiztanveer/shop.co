@@ -32,20 +32,7 @@ type Comment @model {
   updatedAt: AWSDateTime
 }
 
-type Product
-  @model
-  @auth(
-    rules: [
-      # Allow all authenticated users to create, update, and delete products
-      {
-        allow: private
-        operations: [create, update, delete]
-        provider: userPools
-      }
-      # Allow all users (including unauthenticated) to read products
-      { allow: public, operations: [read] }
-    ]
-  ) {
+type Product @model {
   id: ID!
   title: String!
   description: String
@@ -60,6 +47,12 @@ type Product
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
   cartItems: [CartItem] @hasMany(indexName: "byProduct", fields: ["id"])
+}
+
+type ModelProductConnection {
+  items: [Product]
+  nextToken: String
+  totalCount: Int
 }
 
 type Cart @model {

@@ -499,11 +499,11 @@ const ProductPage = () => {
       {contextHolder}
 
       <div className="flex flex-col gap-10 px-4 sm:px-8 lg:px-10 2xl:px-16 py-10">
-        <div className="hidden lg:grid grid-cols-12 grid-rows-3 grid-flow-col gap-2 lg:gap-4 h-[600px]">
+        <div className="hidden lg:grid grid-cols-12 grid-rows-3 grid-flow-col gap-2 lg:gap-4 max-h-[750px]">
           {fetchedProduct.images?.map((image, index) => {
             const isLargeImage = index === 3;
             const spanClass = isLargeImage
-              ? "lg:col-span-5 xl:col-span-4 row-span-3"
+              ? "lg:col-span-5 xl:col-span-4 row-span-3 "
               : "lg:col-span-2 xl:col-span-2 2xl:col-span-1 row-span-1";
 
             return (
@@ -828,7 +828,7 @@ const ProductPage = () => {
             selectedKeys={[current]}
             mode="horizontal"
             items={items}
-            className="border text-base md:text-xl"
+            className="full-width-menu border text-base md:text-xl"
           />
         </div>
 
@@ -878,63 +878,6 @@ const ProductPage = () => {
                   >
                     Write a Review
                   </button>
-
-                  <Modal
-                    title={
-                      <div
-                        style={{ width: "100%", cursor: "move" }}
-                        onMouseOver={() => disabled && setDisabled(false)}
-                        onMouseOut={() => setDisabled(true)}
-                        onFocus={() => {}}
-                        onBlur={() => {}}
-                      >
-                        Post a Review
-                      </div>
-                    }
-                    open={open}
-                    onCancel={handleCancel}
-                    footer={[
-                      <Button key="cancel" onClick={handleCancel}>
-                        Cancel
-                      </Button>,
-                      <Button
-                        key="post"
-                        type="primary"
-                        onClick={handlePostReview}
-                      >
-                        Post
-                      </Button>,
-                    ]}
-                    modalRender={(modal) => (
-                      <Draggable
-                        disabled={disabled}
-                        bounds={bounds}
-                        nodeRef={draggleRef}
-                        onStart={onStart}
-                      >
-                        <div ref={draggleRef}>{modal}</div>
-                      </Draggable>
-                    )}
-                  >
-                    <div className="flex flex-col gap-4">
-                      <Rate
-                        allowHalf
-                        defaultValue={rating.rating}
-                        onChange={handleRatingChange}
-                      />
-                      <div className="flex flex-col gap-2">
-                        <label htmlFor="message">Your Review</label>
-                        <textarea
-                          name="message"
-                          id="message"
-                          placeholder="Write your words here..."
-                          className="border rounded-md py-2 px-3"
-                          value={rating.comment}
-                          onChange={handleMessageChange}
-                        />
-                      </div>
-                    </div>
-                  </Modal>
                 </div>
               </div>
 
@@ -1043,7 +986,7 @@ const ProductPage = () => {
           )}
         </div>
 
-        <div className="flex flex-col gap-6 block md:hidden">
+        <div className="flex flex-col gap-6 md:hidden">
           <div className="flex flex-col md:flex-row gap-6 justify-between">
             <div className="text-xl sm:text-2xl xl:text-3xl flex gap-4 items-end">
               All Reviews
@@ -1076,59 +1019,6 @@ const ProductPage = () => {
               >
                 Write a Review
               </button>
-
-              <Modal
-                title={
-                  <div
-                    style={{ width: "100%", cursor: "move" }}
-                    onMouseOver={() => disabled && setDisabled(false)}
-                    onMouseOut={() => setDisabled(true)}
-                    onFocus={() => {}}
-                    onBlur={() => {}}
-                  >
-                    Post a Review
-                  </div>
-                }
-                open={open}
-                onCancel={handleCancel}
-                footer={[
-                  <Button key="cancel" onClick={handleCancel}>
-                    Cancel
-                  </Button>,
-                  <Button key="post" type="primary" onClick={handlePostReview}>
-                    Post
-                  </Button>,
-                ]}
-                modalRender={(modal) => (
-                  <Draggable
-                    disabled={disabled}
-                    bounds={bounds}
-                    nodeRef={draggleRef}
-                    onStart={onStart}
-                  >
-                    <div ref={draggleRef}>{modal}</div>
-                  </Draggable>
-                )}
-              >
-                <div className="flex flex-col gap-4">
-                  <Rate
-                    allowHalf
-                    defaultValue={rating.rating}
-                    onChange={handleRatingChange}
-                  />
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="message">Your Review</label>
-                    <textarea
-                      name="message"
-                      id="message"
-                      placeholder="Write your words here..."
-                      className="border rounded-md py-2 px-3"
-                      value={rating.comment}
-                      onChange={handleMessageChange}
-                    />
-                  </div>
-                </div>
-              </Modal>
             </div>
           </div>
 
@@ -1144,7 +1034,6 @@ const ProductPage = () => {
                     key={review.id}
                     className="col-span-1 border rounded-xl flex flex-col p-6 space-y-5"
                   >
-                    {/* Rating and Options */}
                     <div className="flex justify-between">
                       <div className="flex gap-1">
                         {[...Array(5)].map((_, i) => (
@@ -1166,7 +1055,6 @@ const ProductPage = () => {
                       />
                     </div>
 
-                    {/* User Info */}
                     <div className="flex gap-2">
                       User {review.userID.substring(0, 6)}...
                       <CheckCircleFilled
@@ -1174,10 +1062,8 @@ const ProductPage = () => {
                       />
                     </div>
 
-                    {/* Comment */}
                     <div>"{review.comment}"</div>
 
-                    {/* Created At */}
                     <div>
                       Posted on{" "}
                       {new Date(review.createdAt).toLocaleDateString("en-US", {
@@ -1204,7 +1090,6 @@ const ProductPage = () => {
                 </div>
               )}
 
-              {/* Disable button and show loading state if all reviews are fetched or in progress */}
               {allReviewsFetched && (
                 <div className="flex justify-center p-6">
                   <Button
@@ -1233,6 +1118,60 @@ const ProductPage = () => {
           }}
         />
       </div>
+
+      <Modal
+        title={
+          <div
+            style={{ width: "100%", cursor: "move" }}
+            onMouseOver={() => disabled && setDisabled(false)}
+            onMouseOut={() => setDisabled(true)}
+            onFocus={() => {}}
+            onBlur={() => {}}
+          >
+            Post a Review
+          </div>
+        }
+        open={open}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="cancel" color="default" variant="outlined" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button color="default" variant="solid" onClick={handlePostReview}>
+            Post Review
+          </Button>,
+        ]}
+        modalRender={(modal) => (
+          <Draggable
+            disabled={disabled}
+            bounds={bounds}
+            nodeRef={draggleRef}
+            onStart={onStart}
+          >
+            <div ref={draggleRef}>{modal}</div>
+          </Draggable>
+        )}
+        className="hidden md:block"
+      >
+        <div className="flex flex-col gap-4">
+          <Rate
+            allowHalf
+            defaultValue={rating.rating}
+            onChange={handleRatingChange}
+          />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="message">Your Review</label>
+            <textarea
+              name="message"
+              id="message"
+              placeholder="Write your words here..."
+              className="border rounded-md py-2 px-3"
+              value={rating.comment}
+              onChange={handleMessageChange}
+            />
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };
