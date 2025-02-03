@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "paths": {
+    "/send-email": {
+      "name": "/send-email",
+      "lambdaFunction": "sendMailToAdmin",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-shopco-dev-d71b2-authRole",
+      "UnauthRoleArn": "arn:aws:iam::201734575271:role/amplify-shopco-dev-d71b2-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::201734575271:role/amplify-shopco-dev-d71b2-authRole",
+      "Region": "ap-southeast-2",
+      "DeploymentBucketName": "amplify-shopco-dev-d71b2-deployment",
+      "UnauthRoleName": "amplify-shopco-dev-d71b2-unauthRole",
+      "StackName": "amplify-shopco-dev-d71b2",
+      "StackId": "arn:aws:cloudformation:ap-southeast-2:201734575271:stack/amplify-shopco-dev-d71b2/79cc1b10-dbf3-11ef-b648-025a9d0bdca1",
+      "AmplifyAppId": "d2r5q2abfb9qa5",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-shopco-dev-d71b2-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "auth": {
+        "shopcoe1ce00e5": {},
+        "userPoolGroups": {}
+      },
+      "api": {
+        "shopco": {},
+        "apib5d9b382": {}
+      },
+      "function": {
+        "S3Trigger50d4566b": {
+          "deploymentBucketName": "amplify-shopco-dev-d71b2-deployment",
+          "s3Key": "amplify-builds/S3Trigger50d4566b-3570472f434a4258714a-build.zip"
+        },
+        "saveUserInfoAfterVerification": {
+          "deploymentBucketName": "amplify-shopco-dev-d71b2-deployment",
+          "s3Key": "amplify-builds/saveUserInfoAfterVerification-614b774a35724162524d-build.zip"
+        },
+        "fetchTopRatedProducts": {
+          "deploymentBucketName": "amplify-shopco-dev-d71b2-deployment",
+          "s3Key": "amplify-builds/fetchTopRatedProducts-65773658357232485567-build.zip"
+        },
+        "sendMailToAdmin": {
+          "deploymentBucketName": "amplify-shopco-dev-d71b2-deployment",
+          "s3Key": "amplify-builds/sendMailToAdmin-503766676f6249616d73-build.zip"
+        }
+      },
+      "storage": {
+        "shopCO": {}
+      }
+    }
+  }
+}

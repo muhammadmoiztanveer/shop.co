@@ -1,0 +1,355 @@
+# this is an auto generated file. This will be overwritten
+
+mutation CreateProduct(
+  $input: CreateProductInput!
+  $condition: ModelProductConditionInput
+) {
+  createProduct(input: $input, condition: $condition) {
+    id
+    title
+    description
+    price
+    discountPercentage
+    category
+    brand
+    images
+    sizes
+    colors
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateProduct(
+  $input: UpdateProductInput!
+  $condition: ModelProductConditionInput
+) {
+  updateProduct(input: $input, condition: $condition) {
+    id
+    title
+    description
+    price
+    discountPercentage
+    category
+    brand
+    images
+    sizes
+    colors
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteProduct(
+  $input: DeleteProductInput!
+  $condition: ModelProductConditionInput
+) {
+  deleteProduct(input: $input, condition: $condition) {
+    id
+    title
+    description
+    price
+    discountPercentage
+    category
+    brand
+    images
+    sizes
+    colors
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation CreateReview(
+  $input: CreateReviewInput!
+  $condition: ModelReviewConditionInput
+) {
+  createReview(input: $input, condition: $condition) {
+    id
+    productID
+    userID
+    rating
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateReview(
+  $input: UpdateReviewInput!
+  $condition: ModelReviewConditionInput
+) {
+  updateReview(input: $input, condition: $condition) {
+    id
+    productID
+    userID
+    rating
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteReview(
+  $input: DeleteReviewInput!
+  $condition: ModelReviewConditionInput
+) {
+  deleteReview(input: $input, condition: $condition) {
+    id
+    productID
+    userID
+    rating
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation CreateComment(
+  $input: CreateCommentInput!
+  $condition: ModelCommentConditionInput
+) {
+  createComment(input: $input, condition: $condition) {
+    id
+    productID
+    userID
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateComment(
+  $input: UpdateCommentInput!
+  $condition: ModelCommentConditionInput
+) {
+  updateComment(input: $input, condition: $condition) {
+    id
+    productID
+    userID
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteComment(
+  $input: DeleteCommentInput!
+  $condition: ModelCommentConditionInput
+) {
+  deleteComment(input: $input, condition: $condition) {
+    id
+    productID
+    userID
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation CreateOrder(
+  $input: CreateOrderInput!
+  $condition: ModelOrderConditionInput
+) {
+  createOrder(input: $input, condition: $condition) {
+    id
+    userID
+    totalAmount
+    status
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateOrder(
+  $input: UpdateOrderInput!
+  $condition: ModelOrderConditionInput
+) {
+  updateOrder(input: $input, condition: $condition) {
+    id
+    userID
+    totalAmount
+    status
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteOrder(
+  $input: DeleteOrderInput!
+  $condition: ModelOrderConditionInput
+) {
+  deleteOrder(input: $input, condition: $condition) {
+    id
+    userID
+    totalAmount
+    status
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation CreateOrderItem(
+  $input: CreateOrderItemInput!
+  $condition: ModelOrderItemConditionInput
+) {
+  createOrderItem(input: $input, condition: $condition) {
+    id
+    orderID
+    productID
+    quantity
+    price
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateOrderItem(
+  $input: UpdateOrderItemInput!
+  $condition: ModelOrderItemConditionInput
+) {
+  updateOrderItem(input: $input, condition: $condition) {
+    id
+    orderID
+    productID
+    quantity
+    price
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteOrderItem(
+  $input: DeleteOrderItemInput!
+  $condition: ModelOrderItemConditionInput
+) {
+  deleteOrderItem(input: $input, condition: $condition) {
+    id
+    orderID
+    productID
+    quantity
+    price
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation CreateContactUs(
+  $input: CreateContactUsInput!
+  $condition: ModelContactUsConditionInput
+) {
+  createContactUs(input: $input, condition: $condition) {
+    id
+    name
+    email
+    phone
+    message
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateContactUs(
+  $input: UpdateContactUsInput!
+  $condition: ModelContactUsConditionInput
+) {
+  updateContactUs(input: $input, condition: $condition) {
+    id
+    name
+    email
+    phone
+    message
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteContactUs(
+  $input: DeleteContactUsInput!
+  $condition: ModelContactUsConditionInput
+) {
+  deleteContactUs(input: $input, condition: $condition) {
+    id
+    name
+    email
+    phone
+    message
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation CreateUser(
+  $input: CreateUserInput!
+  $condition: ModelUserConditionInput
+) {
+  createUser(input: $input, condition: $condition) {
+    id
+    username
+    email
+    password
+    firstName
+    lastName
+    address
+    phone
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation UpdateUser(
+  $input: UpdateUserInput!
+  $condition: ModelUserConditionInput
+) {
+  updateUser(input: $input, condition: $condition) {
+    id
+    username
+    email
+    password
+    firstName
+    lastName
+    address
+    phone
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+mutation DeleteUser(
+  $input: DeleteUserInput!
+  $condition: ModelUserConditionInput
+) {
+  deleteUser(input: $input, condition: $condition) {
+    id
+    username
+    email
+    password
+    firstName
+    lastName
+    address
+    phone
+    createdAt
+    updatedAt
+    __typename
+  }
+}

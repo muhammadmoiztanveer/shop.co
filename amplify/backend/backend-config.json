@@ -1,0 +1,208 @@
+{
+  "api": {
+    "apib5d9b382": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "sendMailToAdmin"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
+    "shopco": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "shopcoe1ce00e5"
+        }
+      ],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+              "userPoolConfig": {
+                "userPoolId": "authshopcoe1ce00e5"
+              }
+            }
+          ],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 7
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
+  "auth": {
+    "shopcoe1ce00e5": {
+      "customAuth": false,
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito"
+    },
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "shopcoe1ce00e5"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups"
+    }
+  },
+  "function": {
+    "S3Trigger50d4566b": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "fetchTopRatedProducts": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "saveUserInfoAfterVerification": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "shopco"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "sendMailToAdmin": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_S3Trigger50d4566b_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger50d4566b"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Trigger50d4566b_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger50d4566b"
+        }
+      ]
+    },
+    "AMPLIFY_function_fetchTopRatedProducts_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "fetchTopRatedProducts"
+        }
+      ]
+    },
+    "AMPLIFY_function_fetchTopRatedProducts_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "fetchTopRatedProducts"
+        }
+      ]
+    },
+    "AMPLIFY_function_saveUserInfoAfterVerification_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "saveUserInfoAfterVerification"
+        }
+      ]
+    },
+    "AMPLIFY_function_saveUserInfoAfterVerification_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "saveUserInfoAfterVerification"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendMailToAdmin_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendMailToAdmin"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendMailToAdmin_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendMailToAdmin"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "shopCO": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "LambdaExecutionRole"
+          ],
+          "category": "function",
+          "resourceName": "S3Trigger50d4566b"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "S3"
+    }
+  }
+}

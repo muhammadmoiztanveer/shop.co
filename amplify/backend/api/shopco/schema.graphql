@@ -1,0 +1,134 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY {
+  globalAuthRule: AuthRule = { allow: public }
+} # FOR TESTING ONLY!
+type User @model @auth(rules: [{ allow: groups, groups: ["Admin"] }]) {
+  id: ID!
+  email: String!
+  phoneNumber: String!
+  type: String!
+  status: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Review @model {
+  id: ID!
+  productID: ID! @index(name: "byProduct")
+  userID: ID! @index(name: "byUser")
+  rating: Float!
+  comment: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Comment @model {
+  id: ID!
+  productID: ID! @index(name: "byProduct")
+  userID: ID! @index(name: "byUser")
+  comment: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Product
+  @model
+  @auth(
+    rules: [
+      # Allow all authenticated users to create, update, and delete products
+      {
+        allow: private
+        operations: [create, update, delete]
+        provider: userPools
+      }
+      # Allow all users (including unauthenticated) to read products
+      { allow: public, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  title: String!
+  description: String
+  price: Float!
+  discountPercentage: Float
+  category: String
+  brand: String
+  images: [String]
+  sizes: [String]
+  colors: [String]
+  quantity: Int
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  cartItems: [CartItem] @hasMany(indexName: "byProduct", fields: ["id"])
+}
+
+type Cart @model {
+  id: ID!
+  userID: ID! @index(name: "byUser")
+  status: String!
+  cartItems: [CartItem] @hasMany(indexName: "byCart", fields: ["id"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type CartItem @model {
+  id: ID!
+  cartID: ID! @index(name: "byCart")
+  productID: ID! @index(name: "byProduct")
+  product: Product @belongsTo(fields: ["productID"])
+  color: String!
+  size: String!
+  quantity: Int!
+  price: Float!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Mutation {
+  deleteCartItemByProductID(productID: ID!): CartItem
+}
+
+type Order @model {
+  id: ID!
+  userID: ID!
+  totalAmount: Float!
+  status: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type OrderItem @model {
+  id: ID!
+  orderID: ID
+  productID: ID!
+  color: String!
+  size: String!
+  quantity: Int!
+  price: Float!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type ContactUs @model {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  message: String!
+  createdAt: AWSDateTime
+}
+
+type ProductRating {
+  productID: ID!
+  averageRating: Float!
+}
+
+type ProductsAverageResponse {
+  topRatedProducts: [ProductRating]!
+  allProducts: [ProductRating]!
+}
+
+type Query {
+  fetchTopRatedProducts: ProductsAverageResponse
+    @function(name: "fetchTopRatedProducts-dev")
+}

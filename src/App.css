@@ -1,0 +1,8 @@
+.anticon {
+  cursor: pointer !important;
+}
+
+.anticon svg {
+  width: "2em" !important;
+  height: "2em" !important;
+}

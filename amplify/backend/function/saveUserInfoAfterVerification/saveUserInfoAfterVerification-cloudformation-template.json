@@ -1,0 +1,602 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.14.1\",\"stackType\":\"function-Lambda\",\"metadata\":{\"whyContinueWithGen1\":\"Prefer not to answer\"}}",
+  "Parameters": {
+    "CloudWatchRule": {
+      "Type": "String",
+      "Default": "NONE",
+      "Description": " Schedule Expression"
+    },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
+    },
+    "apishopcoGraphQLAPIIdOutput": {
+      "Type": "String",
+      "Default": "apishopcoGraphQLAPIIdOutput"
+    },
+    "apishopcoGraphQLAPIEndpointOutput": {
+      "Type": "String",
+      "Default": "apishopcoGraphQLAPIEndpointOutput"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
+        "Handler": "index.handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "saveUserInfoAfterVerification",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "saveUserInfoAfterVerification",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            }
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs18.x",
+        "Layers": [],
+        "Timeout": 25
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "shopcoLambdaRole312b292c",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "shopcoLambdaRole312b292c",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaTriggerPolicyProduct": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-Product",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:ProductTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingProduct": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyProduct",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:ProductTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "LambdaTriggerPolicyUser": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-User",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:UserTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingUser": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyUser",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:UserTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "LambdaTriggerPolicyReview": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-Review",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:ReviewTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingReview": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyReview",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:ReviewTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "LambdaTriggerPolicyComment": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-Comment",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:CommentTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingComment": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyComment",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:CommentTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "LambdaTriggerPolicyOrder": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-Order",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:OrderTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingOrder": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyOrder",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:OrderTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "LambdaTriggerPolicyOrderItem": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-OrderItem",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:OrderItemTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingOrderItem": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyOrderItem",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:OrderItemTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "LambdaTriggerPolicyContactUs": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-ContactUs",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:ContactUsTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingContactUs": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyContactUs",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apishopcoGraphQLAPIIdOutput}:GetAtt:ContactUsTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    },
+    "LambdaExecutionRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaExecutionRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

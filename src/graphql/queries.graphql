@@ -1,0 +1,365 @@
+# this is an auto generated file. This will be overwritten
+
+query GetProduct($id: ID!) {
+  getProduct(id: $id) {
+    id
+    title
+    description
+    price
+    discountPercentage
+    category
+    brand
+    images
+    sizes
+    colors
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+query ListProducts(
+  $filter: ModelProductFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listProducts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      title
+      description
+      price
+      discountPercentage
+      category
+      brand
+      images
+      sizes
+      colors
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query GetReview($id: ID!) {
+  getReview(id: $id) {
+    id
+    productID
+    userID
+    rating
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+query ListReviews(
+  $filter: ModelReviewFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listReviews(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      productID
+      userID
+      rating
+      comment
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query GetComment($id: ID!) {
+  getComment(id: $id) {
+    id
+    productID
+    userID
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+query ListComments(
+  $filter: ModelCommentFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listComments(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      productID
+      userID
+      comment
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query GetOrder($id: ID!) {
+  getOrder(id: $id) {
+    id
+    userID
+    totalAmount
+    status
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+query ListOrders(
+  $filter: ModelOrderFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listOrders(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      userID
+      totalAmount
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query GetOrderItem($id: ID!) {
+  getOrderItem(id: $id) {
+    id
+    orderID
+    productID
+    quantity
+    price
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+query ListOrderItems(
+  $filter: ModelOrderItemFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listOrderItems(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      orderID
+      productID
+      quantity
+      price
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query GetContactUs($id: ID!) {
+  getContactUs(id: $id) {
+    id
+    name
+    email
+    phone
+    message
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+query ListContactuses(
+  $filter: ModelContactUsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listContactuses(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      name
+      email
+      phone
+      message
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query ReviewsByProductID(
+  $productID: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelReviewFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  reviewsByProductID(
+    productID: $productID
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      productID
+      userID
+      rating
+      comment
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query ReviewsByUserID(
+  $userID: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelReviewFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  reviewsByUserID(
+    userID: $userID
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      productID
+      userID
+      rating
+      comment
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query CommentsByProductID(
+  $productID: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelCommentFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  commentsByProductID(
+    productID: $productID
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      productID
+      userID
+      comment
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query CommentsByUserID(
+  $userID: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelCommentFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  commentsByUserID(
+    userID: $userID
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      productID
+      userID
+      comment
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+
+query GetUser($id: ID!) {
+  getUser(id: $id) {
+    id
+    username
+    email
+    password
+    firstName
+    lastName
+    address
+    phone
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+query ListUsers(
+  $filter: ModelUserFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listUsers(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      username
+      email
+      password
+      firstName
+      lastName
+      address
+      phone
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}

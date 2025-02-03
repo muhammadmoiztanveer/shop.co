@@ -1,0 +1,14 @@
+{
+  "resourceName": "shopCO",
+  "policyUUID": "dc149bbd",
+  "bucketName": "shopco6adfdb2927b64b12901f297fad6b47b0",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "S3Trigger50d4566b",
+  "groupAccess": {}
+}

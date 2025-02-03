@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "shopco",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authshopcoe1ce00e5",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

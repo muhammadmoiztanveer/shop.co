@@ -1,0 +1,292 @@
+# this is an auto generated file. This will be overwritten
+
+subscription OnCreateProduct($filter: ModelSubscriptionProductFilterInput) {
+  onCreateProduct(filter: $filter) {
+    id
+    title
+    description
+    price
+    discountPercentage
+    category
+    brand
+    images
+    sizes
+    colors
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateProduct($filter: ModelSubscriptionProductFilterInput) {
+  onUpdateProduct(filter: $filter) {
+    id
+    title
+    description
+    price
+    discountPercentage
+    category
+    brand
+    images
+    sizes
+    colors
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteProduct($filter: ModelSubscriptionProductFilterInput) {
+  onDeleteProduct(filter: $filter) {
+    id
+    title
+    description
+    price
+    discountPercentage
+    category
+    brand
+    images
+    sizes
+    colors
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnCreateReview($filter: ModelSubscriptionReviewFilterInput) {
+  onCreateReview(filter: $filter) {
+    id
+    productID
+    userID
+    rating
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateReview($filter: ModelSubscriptionReviewFilterInput) {
+  onUpdateReview(filter: $filter) {
+    id
+    productID
+    userID
+    rating
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteReview($filter: ModelSubscriptionReviewFilterInput) {
+  onDeleteReview(filter: $filter) {
+    id
+    productID
+    userID
+    rating
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnCreateComment($filter: ModelSubscriptionCommentFilterInput) {
+  onCreateComment(filter: $filter) {
+    id
+    productID
+    userID
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateComment($filter: ModelSubscriptionCommentFilterInput) {
+  onUpdateComment(filter: $filter) {
+    id
+    productID
+    userID
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteComment($filter: ModelSubscriptionCommentFilterInput) {
+  onDeleteComment(filter: $filter) {
+    id
+    productID
+    userID
+    comment
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnCreateOrder($filter: ModelSubscriptionOrderFilterInput) {
+  onCreateOrder(filter: $filter) {
+    id
+    userID
+    totalAmount
+    status
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateOrder($filter: ModelSubscriptionOrderFilterInput) {
+  onUpdateOrder(filter: $filter) {
+    id
+    userID
+    totalAmount
+    status
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteOrder($filter: ModelSubscriptionOrderFilterInput) {
+  onDeleteOrder(filter: $filter) {
+    id
+    userID
+    totalAmount
+    status
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnCreateOrderItem($filter: ModelSubscriptionOrderItemFilterInput) {
+  onCreateOrderItem(filter: $filter) {
+    id
+    orderID
+    productID
+    quantity
+    price
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateOrderItem($filter: ModelSubscriptionOrderItemFilterInput) {
+  onUpdateOrderItem(filter: $filter) {
+    id
+    orderID
+    productID
+    quantity
+    price
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteOrderItem($filter: ModelSubscriptionOrderItemFilterInput) {
+  onDeleteOrderItem(filter: $filter) {
+    id
+    orderID
+    productID
+    quantity
+    price
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnCreateContactUs($filter: ModelSubscriptionContactUsFilterInput) {
+  onCreateContactUs(filter: $filter) {
+    id
+    name
+    email
+    phone
+    message
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateContactUs($filter: ModelSubscriptionContactUsFilterInput) {
+  onUpdateContactUs(filter: $filter) {
+    id
+    name
+    email
+    phone
+    message
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteContactUs($filter: ModelSubscriptionContactUsFilterInput) {
+  onDeleteContactUs(filter: $filter) {
+    id
+    name
+    email
+    phone
+    message
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnCreateUser($filter: ModelSubscriptionUserFilterInput) {
+  onCreateUser(filter: $filter) {
+    id
+    username
+    email
+    password
+    firstName
+    lastName
+    address
+    phone
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnUpdateUser($filter: ModelSubscriptionUserFilterInput) {
+  onUpdateUser(filter: $filter) {
+    id
+    username
+    email
+    password
+    firstName
+    lastName
+    address
+    phone
+    createdAt
+    updatedAt
+    __typename
+  }
+}
+
+subscription OnDeleteUser($filter: ModelSubscriptionUserFilterInput) {
+  onDeleteUser(filter: $filter) {
+    id
+    username
+    email
+    password
+    firstName
+    lastName
+    address
+    phone
+    createdAt
+    updatedAt
+    __typename
+  }
+}

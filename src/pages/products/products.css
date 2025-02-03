@@ -1,0 +1,73 @@
+.custom-menu-wrapper .custom-menu-item {
+  height: auto !important;
+  line-height: normal !important;
+  white-space: normal !important;
+  padding: 0 !important;
+  background-color: white;
+}
+
+.custom-menu-wrapper .custom-menu-item:hover {
+  background-color: white !important;
+  color: inherit !important;
+}
+
+.custom-menu-wrapper .custom-menu-item.ant-menu-item-selected {
+  background-color: white !important;
+  color: inherit !important;
+}
+
+.custom-menu-wrapper .custom-menu-item:focus {
+  background-color: transparent !important;
+  color: inherit !important;
+  outline: none !important;
+}
+
+.custom-menu-wrapper .ant-menu-submenu-title {
+  padding-left: 0 !important;
+}
+
+.custom-menu-wrapper ant-menu-submenu-title:hover {
+  background: #000 !important;
+}
+
+.custom-menu-wrapper .ant-menu-title-content {
+  padding: 20px !important;
+}
+
+.custom-menu-wrapper
+  .custom-font-style
+  > .ant-menu-submenu-title
+  > .ant-menu-title-content {
+  font-size: 1.25rem;
+  font-weight: 450;
+}
+
+.custom-menu-wrapper .ant-menu {
+  border: 0 !important;
+}
+
+.custom-menu-wrapper .ant-menu-submenu-title:active,
+.custom-menu-wrapper .ant-menu-submenu-title:focus {
+  background-color: black !important;
+  color: white !important;
+}
+
+.custom-menu-wrapper .ant-menu-item-selected {
+  background-color: black !important;
+  color: white !important;
+  padding-bottom: 0 !important;
+}
+
+.custom-menu-wrapper
+  .ant-menu-submenu-open
+  > .ant-menu-submenu-title
+  > .ant-menu-title-content {
+  color: black !important;
+}
+
+.custom-menu-wrapper
+  .ant-menu-submenu-open
+  > .ant-menu-submenu-title
+  > .ant-menu-submenu-arrow {
+  color: black !important;
+}
