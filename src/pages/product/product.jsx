@@ -72,6 +72,7 @@ const ProductPage = () => {
   const [selectedSize, setSelectedSize] = useState(null);
 
   const [messageApi, contextHolder] = message.useMessage();
+  const [isReviewPosted, setIsReviewPosted] = useState(false);
 
   useEffect(() => {
     if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
@@ -182,23 +183,27 @@ const ProductPage = () => {
     window.location.reload();
   }
 
-  const fetchFilteredReviews = async (limit = 6) => {
+  const fetchFilteredReviews = async (limit = 10) => {
     setLoadingReviews(true);
 
     try {
+      const variables = {
+        filter: {
+          productID: { eq: `${id}` },
+        },
+      };
+
       const reviewsResponse = await client.graphql({
         query: listReviews,
-        variables: {
-          filter: {
-            productID: { eq: `${id}` },
-            // userID: { eq: `${userId ?? ""}` },
-          },
-          limit: limit,
-        },
+        variables,
       });
 
-      if (reviewsResponse?.data?.listReviews?.items) {
-        setFetchedReviews(reviewsResponse.data.listReviews.items);
+      const allItems = reviewsResponse?.data?.listReviews?.items || [];
+
+      const limitedItems = allItems.slice(0, 6);
+
+      if (limitedItems) {
+        setFetchedReviews(limitedItems);
       }
 
       setAllReviewsFetched(false);
@@ -314,6 +319,8 @@ const ProductPage = () => {
       return;
     }
 
+    setIsReviewPosted(true);
+
     console.log("Submitting Review:", rating);
 
     try {
@@ -323,8 +330,14 @@ const ProductPage = () => {
           input: rating,
         },
       });
+
+      message.success("Review posted successfully!");
+      handleCancel();
     } catch (error) {
       console.error("Error submitting review:", error);
+      message.error("Failed to post review. Please try again.");
+    } finally {
+      setIsReviewPosted(false);
     }
   };
 
@@ -1134,11 +1147,16 @@ const ProductPage = () => {
         open={open}
         onCancel={handleCancel}
         footer={[
-          <Button key="cancel" color="default" variant="outlined" onClick={handleCancel}>
+          <Button
+            key="cancel"
+            color="default"
+            variant="outlined"
+            onClick={handleCancel}
+          >
             Cancel
           </Button>,
           <Button color="default" variant="solid" onClick={handlePostReview}>
-            Post Review
+            {isReviewPosted ? "Posting..." : "Post Review"}
           </Button>,
         ]}
         modalRender={(modal) => (
