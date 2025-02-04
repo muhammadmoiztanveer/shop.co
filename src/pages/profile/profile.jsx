@@ -175,7 +175,7 @@ const ProfilePage = () => {
           enableReinitialize
         >
           {({ isSubmitting }) => (
-            <Form className="col-span-2 xl:col-span-1 flex flex-col gap-5 border rounded-lg p-16 shadow-md">
+            <Form className="col-span-2 xl:col-span-1 flex flex-col gap-5 border rounded-lg px-4 py-8 sm:px-6 sm:py-8 md:p-16 shadow-md">
               <h1 className="text-2xl font-bold mb-4">Update Email</h1>
               <div className="mb-4">
                 <Field
@@ -253,7 +253,7 @@ const ProfilePage = () => {
           onSubmit={handlePasswordSubmit}
         >
           {({ isSubmitting }) => (
-            <Form className="col-span-2 xl:col-span-1 flex flex-col gap-5 border rounded-lg p-16 shadow-md">
+            <Form className="col-span-2 xl:col-span-1 flex flex-col gap-5 border rounded-lg px-4 py-8 sm:px-6 sm:py-8 md:p-16 shadow-md">
               <h1 className="text-2xl font-bold mb-4">Update Password</h1>
               <div className="mb-4">
                 <Field

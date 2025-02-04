@@ -122,6 +122,72 @@
       "service": "Lambda"
     }
   },
+  "parameters": {
+    "AMPLIFY_function_S3Trigger50d4566b_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger50d4566b"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Trigger50d4566b_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger50d4566b"
+        }
+      ]
+    },
+    "AMPLIFY_function_fetchTopRatedProducts_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "fetchTopRatedProducts"
+        }
+      ]
+    },
+    "AMPLIFY_function_fetchTopRatedProducts_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "fetchTopRatedProducts"
+        }
+      ]
+    },
+    "AMPLIFY_function_saveUserInfoAfterVerification_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "saveUserInfoAfterVerification"
+        }
+      ]
+    },
+    "AMPLIFY_function_saveUserInfoAfterVerification_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "saveUserInfoAfterVerification"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendMailToAdmin_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendMailToAdmin"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendMailToAdmin_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendMailToAdmin"
+        }
+      ]
+    }
+  },
   "storage": {
     "shopCO": {
       "dependsOn": [

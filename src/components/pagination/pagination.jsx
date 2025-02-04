@@ -160,7 +160,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
             onClick={() => handlePageChange(page)}
             className={`px-4 py-2 text-base rounded-xl ${
               page === currentPage
-                ? "bg-black text-white"
+                ? "border border-black text-black"
                 : "bg-white text-gray-500 hover:bg-gray-100"
             }`}
           >
@@ -177,7 +177,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
       <a
         href="#"
         onClick={() => handlePageChange(currentPage - 1)}
-        className="flex items-center justify-center gap-2 px-4 h-10 text-base font-medium text-white bg-black border border-black rounded-lg"
+        className="flex items-center justify-center gap-2 px-4 h-10 text-base font-medium text-black border border-black rounded-lg"
         disabled={currentPage === 1}
       >
         <ArrowLeftOutlined />
@@ -188,7 +188,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
       <a
         href="#"
         onClick={() => handlePageChange(currentPage + 1)}
-        className="flex items-center justify-center gap-2 px-4 h-10 text-base font-medium text-white bg-black border border-black rounded-lg"
+        className="flex items-center justify-center gap-2 px-4 h-10 text-base font-medium text-black border border-black rounded-lg"
         disabled={currentPage === totalPages}
       >
         Next

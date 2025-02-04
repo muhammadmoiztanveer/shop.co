@@ -12,14 +12,14 @@ import Pagination from "@/components/pagination/pagination";
 import { listProducts } from "../../graphql/queries";
 import { generateClient } from "aws-amplify/api";
 import { StorageImage } from "@aws-amplify/ui-react-storage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { listProductFilters } from "../../graphql/customQueries";
 import { fetchTopRatedProducts } from "../../graphql/queries";
 
 const Products = () => {
   const client = generateClient();
   const navigate = useNavigate();
-  const section = location.state?.from;
+  const location = useLocation();
 
   const [loading, setLoading] = useState(true);
 
@@ -42,8 +42,37 @@ const Products = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
+  useEffect(() => {
+    if (location.state) {
+      const { type, value } = location.state;
+
+      switch (type) {
+        case "new-arrivals":
+          console.log("hello");
+          break;
+        case "top-rated":
+          console.log("hello");
+          break;
+        case "category":
+          console.log("hello");
+          break;
+        case "search":
+          console.log("hello");
+          break;
+        default:
+          console.log("Unknown navigation type");
+      }
+
+      window.history.replaceState({}, document.title);
+    } else {
+      console.log("hello");
+    }
+  }, [location]);
+
   const handleMenuClick = (e) => {
     const { key } = e;
+
+    console.log("keyuuuuuuuuuuuuuuu", key);
 
     // Parse the key into filterCategory and filterValue
     const keyParts = key.split("-");
@@ -261,6 +290,9 @@ const Products = () => {
   useEffect(() => {
     if (Object.keys(selectedFilters).length > 0) {
       // If selectedFilters are applied, fetch filtered products
+
+      console.log("selected filter to make the requestsssss", selectedFilters);
+
       listFilteredProducts(selectedFilters, currentPage);
     } else {
       // Otherwise, fetch all products
@@ -625,7 +657,7 @@ const Products = () => {
       Object.values(dressStyle).forEach((categories) => {
         selectedCategories.push(...categories);
       });
-      filter.category = { in: [...new Set(selectedCategories)] }; // Remove duplicates
+      filter.title = { in: [...new Set(selectedCategories)] }; // Remove duplicates
     }
 
     // Add color filter
@@ -648,25 +680,60 @@ const Products = () => {
 
   const listFilteredProducts = async (filters, page = 1) => {
     setLoading(true);
+
     try {
+      console.log("beforeeee converting filterss", filters);
+
       const filter = constructFilter(filters);
       let allProducts = [];
       let nextToken = null;
 
-      // Calculate the starting token for the desired page
+      console.log("filterss", filter);
+
       for (let i = 1; i < page; i++) {
         const response = await client.graphql({
           query: listProducts,
-          variables: { filter, limit: 10, nextToken },
+          variables: {
+            limit: 10,
+            filter: {
+              and: [
+                {
+                  or: [
+                    { brand: { in: ["Prada"] } },
+                    { title: { in: ["jeans", "hoodies"] } },
+                  ],
+                },
+                { colors: { contains: "#eb0000" } },
+                { price: { between: [0, 100] } },
+                { sizes: { contains: "xx-small" } },
+              ],
+            },
+            nextToken,
+          },
         });
         nextToken = response.data.listProducts.nextToken;
-        if (!nextToken) break; // Stop if there are no more pages
+        if (!nextToken) break;
       }
 
-      // Fetch the desired page
       const response = await client.graphql({
         query: listProducts,
-        variables: { filter, limit: 10, nextToken },
+        variables: {
+          limit: 10,
+          filter: {
+            and: [
+              {
+                or: [
+                  { brand: { in: ["Prada"] } },
+                  { title: { in: ["jeans", "hoodies"] } },
+                ],
+              },
+              { colors: { contains: "#eb0000" } },
+              { price: { between: [0, 100] } },
+              { sizes: { contains: "xx-small" } },
+            ],
+          },
+          nextToken,
+        },
       });
 
       console.log("FILTERED PROducts fetched paginated", response);

@@ -5,9 +5,7 @@ import {
   UserOutlined,
   SearchOutlined,
   MenuOutlined,
-  UploadOutlined,
   PlusOutlined,
-  LoadingOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -26,10 +24,8 @@ import { signOut } from "aws-amplify/auth";
 import MultiColorPicker from "@/components/multiColorPicker/multiColorPicker";
 import { generateClient } from "aws-amplify/api";
 import { createProduct } from "@/graphql/mutations";
-import { useFormik } from "formik";
 import * as Yup from "yup";
 import { uploadData, getProperties, list } from "aws-amplify/storage";
-import { StorageImage, FileUploader } from "@aws-amplify/ui-react-storage";
 import { v4 as uuid } from "uuid";
 import { ProductContext } from "../../context/productContext/productContext";
 
@@ -45,8 +41,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAddProductModalVisible, setIsAddProductModalVisible] =
     useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [errors, setErrors] = useState({}); // State to store validation errors
+  const [errors, setErrors] = useState({});
   const [product, setProduct] = useState({
     title: "",
     description: "",
@@ -68,6 +63,7 @@ const Navbar = () => {
   const [showGlobalSpinner, setShowGlobalSpinner] = useState(false);
   const [selectedColors, setSelectedColors] = useState([]);
   const [resetColorPicker, setResetColorPicker] = useState(false);
+  const [searchInputText, setSearchInputText] = useState("");
 
   const dropdownRef = useRef(null);
 
@@ -337,52 +333,42 @@ const Navbar = () => {
 
   const menuItems = [
     {
-      key: "sub1",
+      key: "shop",
       label: "Shop",
       children: [
         {
           key: "1",
-          label: "Option 3",
+          label: "T-Shirts",
         },
         {
           key: "2",
-          label: "Option 4",
+          label: "Trousers",
         },
         {
-          key: "sub1-2",
-          label: "Submenu",
-          children: [
-            {
-              key: "3",
-              label: "Option 5",
-            },
-            {
-              key: "4",
-              label: "Option 6",
-            },
-          ],
+          key: "3",
+          label: "Shoes",
         },
       ],
     },
     {
-      key: "5",
-      label: "On Sale",
+      key: "top-sales",
+      label: "Top Sales",
     },
     {
-      key: "6",
+      key: "new-arrivals",
       label: "New Arrivals",
     },
     {
-      key: "7",
+      key: "brands",
       label: "Brands",
     },
     {
-      key: "8",
+      key: "contact-us",
       label: "Contact Us",
     },
     {
-      key: "9",
-      label: "About Us",
+      key: "add-product",
+      label: "Add Product",
     },
   ];
 
@@ -573,6 +559,19 @@ const Navbar = () => {
     discountPercentage: Yup.number().nullable(),
   });
 
+  useEffect(() => {
+    console.log("searchInputText", searchInputText);
+  }, [searchInputText]);
+
+  function handleSearch() {
+    if (searchInputText !== "") {
+      navigate("/products", {
+        state: { key: "search", value: `${searchInputText}` },
+      });
+      setSearchInputText("");
+    }
+  }
+
   return (
     <>
       <div className="relative w-full bg-white px-4 sm:px-8 lg:px-4 xl:px-10 2xl:px-16 py-6 flex justify-between items-center lg:gap-6 xl:gap-0 z-50 border-0 border-b">
@@ -604,6 +603,7 @@ const Navbar = () => {
                   to={{
                     pathname: "/products",
                   }}
+                  state={{ key: "category", value: "dynamic-category" }}
                   className="text-inherit"
                 >
                   Shop
@@ -616,6 +616,7 @@ const Navbar = () => {
               to={{
                 pathname: "/products",
               }}
+              state={{ key: "top-rated" }}
               onClick={handleTopSalesClick}
             >
               <Button
@@ -631,6 +632,7 @@ const Navbar = () => {
               to={{
                 pathname: "/products",
               }}
+              state={{ key: "new-arrivals" }}
               onClick={handleNewArrivalsClick}
             >
               <Button
@@ -673,11 +675,12 @@ const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex px-4 rounded-full bg-gray-100 flex items-center w-fit space-x-4">
-            <SearchOutlined className="text-2xl" />
+            <SearchOutlined className="text-2xl" onClick={handleSearch} />
             <input
               type="text"
               className="block w-58 xl:w-72 2xl:w-96 py-1.5 2xl:py-2 bg-transparent focus:outline-0 placeholder:text-black/50 lg:placeholder:text-sm 2xl:placeholder:text-lg"
               placeholder="Search for products..."
+              onChange={(e) => setSearchInputText(e.target.value)}
             />
           </div>
 
@@ -732,29 +735,6 @@ const Navbar = () => {
       </div>
 
       <div className="relative">
-        {/* Sliding Manu */}
-        {/* <Menu
-          style={{
-            width: "100%",
-          }}
-          className={`
-          lg:hidden
-          shadow-0
-          relative
-          w-full
-          overflow-y-auto
-          bg-white
-          transition-all
-          duration-900
-          ease-in-out
-          ${isMenuVisible ? "translate-y-0" : "-translate-y-full"}
-        `}
-          defaultSelectedKeys={["1"]}
-          defaultOpenKeys={["sub1"]}
-          mode={"inline"}
-          items={menuItems}
-        /> */}
-
         <div
           className={`lg:hidden w-full overflow-y-auto bg-white transition-all ease-in-out border border-b ${
             isMenuVisible ? "h-fit" : "h-0"
@@ -773,21 +753,32 @@ const Navbar = () => {
               height: "100%",
               transition: "all 0.6s ease-in-out",
             }}
-            defaultSelectedKeys={["1"]}
-            defaultOpenKeys={["sub1"]}
+            defaultSelectedKeys={["shop"]}
+            defaultOpenKeys={["shop"]}
             mode="inline"
             items={menuItems}
+            onClick={(e) => {
+              console.log("Clicked menu item:", e.key);
+
+              if (e.key === "top-sales") {
+                handleTopSalesClick();
+              } else if (e.key === "new-arrivals") {
+                handleNewArrivalsClick();
+              } else if (e.key === "add-product") {
+                handleAddProductModal();
+              }
+            }}
           />
         </div>
 
         {/* Search Input Component */}
-        {isSearchInputVisible && ( // Conditionally render the search input
+        {isSearchInputVisible && (
           <div
-            className={`flex lg:hidden justify-between items-center gap-4 p-4 w-full bg-white transition-all duration-600 ease-in-out translate-y-0 opacity-100`}
+            className={`flex lg:hidden justify-between items-center gap-4 p-4 w-full bg-white transition-all duration-600 ease-in-out translate-y-0 opacity-100 border-0 border-b`}
             style={{
-              maxHeight: "80px", // Fixed height when open
-              overflow: "hidden", // Prevent content overflow
-              zIndex: 10, // Ensure proper stacking context
+              maxHeight: "80px",
+              overflow: "hidden",
+              zIndex: 10,
             }}
           >
             <div className="flex items-center w-full space-x-4 px-4 rounded-lg bg-gray-100">
@@ -795,13 +786,14 @@ const Navbar = () => {
                 type="text"
                 className="w-full py-1 bg-transparent focus:outline-0 placeholder:text-black/50 placeholder:text-sm"
                 placeholder="Search for products..."
+                onChange={(e) => setSearchInputText(e.target.value)}
               />
             </div>
             <Button
               color="default"
               variant="solid"
               className="rounded-md"
-              onClick={() => alert("Search button clicked!")}
+              onClick={handleSearch}
             >
               Search
             </Button>
