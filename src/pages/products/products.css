@@ -1,9 +1,14 @@
+.ant-menu-light.ant-menu-root.ant-menu-inline {
+  border-inline-end: none !important;
+}
+
 .custom-menu-wrapper .custom-menu-item {
   height: auto !important;
   line-height: normal !important;
   white-space: normal !important;
   padding: 0 !important;
   background-color: white;
+  border: 0 !important;
 }
 
 .custom-menu-wrapper .custom-menu-item:hover {

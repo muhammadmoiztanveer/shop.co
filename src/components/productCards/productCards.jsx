@@ -44,8 +44,8 @@ const ProductCards = ({
 
   return (
     <div className="w-full flex flex-col items-center space-y-24 py-24 px-4 sm:px-8 lg:px-10 2xl:px-16">
-      <div className="text-4xl">{title}</div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
+      <div className="text-center text-4xl">{title}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
         {loadingNewArrivals
           ? Array(4)
               .fill(0)
@@ -118,11 +118,11 @@ const ProductCards = ({
                     <div className="ps-4">
                       {product.averageRating
                         ? `${product.averageRating.toFixed(1)} / 5`
-                        : "No ratings"}
+                        : ""}
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="xl:text-2xl 2xl:text-3xl font-bold">
+                    <div className="text-lg xl:text-2xl 2xl:text-3xl font-bold">
                       $
                       {Math.round(
                         product.price * (1 - product.discountPercentage / 100)
@@ -131,7 +131,7 @@ const ProductCards = ({
                     {product.discountPercentage > 0 && (
                       <div className="flex justify-between w-full">
                         <div className="flex items-center gap-4">
-                          <div className="xl:text-2xl 2xl:text-3xl font-bold line-through text-[#7c7b7b]">
+                          <div className="text-lg xl:text-2xl 2xl:text-3xl font-bold line-through text-[#7c7b7b]">
                             ${product.price}
                           </div>
                           <Button
@@ -153,7 +153,7 @@ const ProductCards = ({
                           {loading && product.id === productIdBeingDeleted ? (
                             <Spin />
                           ) : (
-                            <DeleteFilled className="text-3xl text-red-500" />
+                            <DeleteFilled className="text-2xl xl:text-3xl text-red-500" />
                           )}
                         </span>
                       </div>

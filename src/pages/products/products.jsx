@@ -14,6 +14,7 @@ import { generateClient } from "aws-amplify/api";
 import { StorageImage } from "@aws-amplify/ui-react-storage";
 import { useNavigate } from "react-router-dom";
 import { listProductFilters } from "../../graphql/customQueries";
+import { fetchTopRatedProducts } from "../../graphql/queries";
 
 const Products = () => {
   const client = generateClient();
@@ -187,14 +188,14 @@ const Products = () => {
   const listAllProducts = async (page = 1) => {
     setLoading(true);
     try {
-      let allProducts = [];
+      let products = [];
       let nextToken = null;
 
       // Calculate the starting token for the desired page
       for (let i = 1; i < page; i++) {
         const response = await client.graphql({
           query: listProducts,
-          variables: { limit: 10, nextToken },
+          variables: { limit: 10 },
         });
         nextToken = response.data.listProducts.nextToken;
         if (!nextToken) break; // Stop if there are no more pages
@@ -206,8 +207,38 @@ const Products = () => {
         variables: { limit: 10, nextToken },
       });
 
-      allProducts = response.data.listProducts.items;
-      setProducts(allProducts);
+      const lambdaResponse = await client.graphql({
+        query: fetchTopRatedProducts,
+      });
+
+      const { allProducts } = lambdaResponse.data.fetchTopRatedProducts;
+
+      if (response.data.listProducts.items.length > 0) {
+        const updatedNewArrivals = response.data.listProducts.items.map(
+          (product) => {
+            const productRating = allProducts.find(
+              (item) => item.productID === product.id
+            )?.averageRating;
+
+            return {
+              ...product,
+              averageRating: productRating || 0,
+            };
+          }
+        );
+
+        setProducts(updatedNewArrivals);
+      } else {
+        const updatedNewArrivals =
+          newArrivalsResponse.data.listProducts.items.map((product) => {
+            return {
+              ...product,
+              averageRating: 0,
+            };
+          });
+
+        setProducts(updatedNewArrivals);
+      }
 
       // Fetch the desired page
       const fetchAllProducts = await client.graphql({
@@ -663,7 +694,7 @@ const Products = () => {
   return (
     <div className="w-full px-4 sm:px-8 lg:px-4 xl:px-10 2xl:px-16 py-10">
       <div className="grid grid-cols-12 gap-6 h-fit">
-        <div className="col-span-12 lg:col-span-4 xl:col-span-3 border rounded-2xl md:rounded-3xl overflow-hidden p-4 lg:p-2">
+        <div className="col-span-12 lg:col-span-4 xl:col-span-3 border rounded-2xl md:rounded-3xl overflow-hidden p-4 lg:p-2 h-fit">
           <div
             className="lg:hidden flex justify-between cursor-pointer"
             onClick={toggleMenu}
@@ -680,7 +711,9 @@ const Products = () => {
           {/* Menu */}
           <div
             className={` transition-all duration-300 ease-in-out ${
-              menuOpen ? "border-0 border-t mt-4 max-h-auto opacity-100" : "max-h-0 opacity-0"
+              menuOpen
+                ? "border-0 border-t lg:border-t-0 mt-4 lg:mt-0 max-h-auto opacity-100"
+                : "max-h-0 opacity-0"
             } overflow-hidden`}
           >
             <Menu
@@ -697,7 +730,7 @@ const Products = () => {
                 shape="round"
                 color="default"
                 iconPosition={"end"}
-                className="w-full text-lg py-6"
+                className="w-full text-lg py-6 mb-2"
                 onClick={() => listFilteredProducts(selectedFilters)}
               >
                 Apply Filters
@@ -719,7 +752,7 @@ const Products = () => {
                   Showing {currentPage}-{totalPages} of {totalCount} Products
                 </div>
                 <div className="flex justify-end items-center gap-4">
-                  <div>Sort By:</div>
+                  <div className="text-black">Sort By:</div>
 
                   <Select
                     size="large"
@@ -752,7 +785,7 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-y-10 gap-x-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-y-10 gap-x-6">
               {products.map((product, index) => {
                 const { id, title, price, discountPercentage, images } =
                   product;

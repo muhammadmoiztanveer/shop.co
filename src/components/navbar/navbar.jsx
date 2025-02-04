@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   DownOutlined,
   ShoppingCartOutlined,
@@ -31,10 +31,13 @@ import * as Yup from "yup";
 import { uploadData, getProperties, list } from "aws-amplify/storage";
 import { StorageImage, FileUploader } from "@aws-amplify/ui-react-storage";
 import { v4 as uuid } from "uuid";
+import { ProductContext } from "../../context/productContext/productContext";
 
 const Navbar = () => {
   const client = generateClient();
   const navigate = useNavigate();
+
+  const { setRefreshProducts } = useContext(ProductContext);
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isSearchInputVisible, setIsSearchInputVisible] = useState(false);
@@ -61,9 +64,10 @@ const Navbar = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
-  const [uploadingFiles, setUploadingFiles] = useState({}); // Track upload progress and status for each file
-  const [showGlobalSpinner, setShowGlobalSpinner] = useState(false); // Global spinner state
+  const [uploadingFiles, setUploadingFiles] = useState({});
+  const [showGlobalSpinner, setShowGlobalSpinner] = useState(false);
   const [selectedColors, setSelectedColors] = useState([]);
+  const [resetColorPicker, setResetColorPicker] = useState(false);
 
   const dropdownRef = useRef(null);
 
@@ -210,6 +214,8 @@ const Navbar = () => {
       setUploadingFiles({});
       setFileList([]);
       setSelectedColors([]);
+      setResetColorPicker(true);
+      setRefreshProducts((prev) => !prev);
     } catch (errors) {
       if (errors instanceof Yup.ValidationError) {
         // Collect all validation errors
@@ -750,22 +756,22 @@ const Navbar = () => {
         /> */}
 
         <div
-          className={`lg:hidden w-full overflow-y-auto bg-white transition-all ease-in-out ${
+          className={`lg:hidden w-full overflow-y-auto bg-white transition-all ease-in-out border border-b ${
             isMenuVisible ? "h-fit" : "h-0"
           }`}
           style={{
             width: "100%",
-            transform: isMenuVisible ? "translateY(0)" : "translateY(-100%)", // Sliding animation
-            opacity: isMenuVisible ? 1 : 0, // Fade-in/fade-out effect
-            maxHeight: isMenuVisible ? "none" : 0, // Smooth height transition
-            transition: "all 0.6s ease-in-out", // Longer duration for smoother animation
+            transform: isMenuVisible ? "translateY(0)" : "translateY(-100%)",
+            opacity: isMenuVisible ? 1 : 0,
+            maxHeight: isMenuVisible ? "none" : 0,
+            transition: "all 0.6s ease-in-out",
           }}
         >
           <Menu
             style={{
               width: "100%",
               height: "100%",
-              transition: "all 0.6s ease-in-out", // Ensure Menu content animates smoothly
+              transition: "all 0.6s ease-in-out",
             }}
             defaultSelectedKeys={["1"]}
             defaultOpenKeys={["sub1"]}
@@ -1069,6 +1075,7 @@ const Navbar = () => {
               </label>
               <MultiColorPicker
                 onColorChange={(colors) => handleInputChange("colors", colors)}
+                reset={resetColorPicker}
               />
               {errors.colors && (
                 <span style={{ color: "red", fontSize: "0.875rem" }}>

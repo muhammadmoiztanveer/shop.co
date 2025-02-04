@@ -1,9 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import OliveTShirt1 from "@/assets/olive-tshirt-1.png";
-import OliveTShirt2 from "@/assets/olive-tshirt-2.png";
-import OliveTShirt3 from "@/assets/olive-tshirt-3.png";
-import cloth1 from "@/assets/cloth-1.png";
 import {
   StarFilled,
   MinusOutlined,
@@ -512,12 +508,12 @@ const ProductPage = () => {
       {contextHolder}
 
       <div className="flex flex-col gap-10 px-4 sm:px-8 lg:px-10 2xl:px-16 py-10">
-        <div className="hidden lg:grid grid-cols-12 grid-rows-3 grid-flow-col gap-2 lg:gap-4 max-h-[750px]">
+        <div className="hidden 2xl:grid grid-cols-12 grid-rows-3 grid-flow-col gap-2 lg:gap-4 max-h-[750px]">
           {fetchedProduct.images?.map((image, index) => {
             const isLargeImage = index === 3;
             const spanClass = isLargeImage
-              ? "lg:col-span-5 xl:col-span-4 row-span-3 "
-              : "lg:col-span-2 xl:col-span-2 2xl:col-span-1 row-span-1";
+              ? "col-span-4 row-span-3 "
+              : "col-span-1 row-span-1";
 
             return (
               <div
@@ -533,7 +529,7 @@ const ProductPage = () => {
             );
           })}
 
-          <div className="col-span-5 xl:col-span-6 2xl:col-span-7 row-span-3 px-4 xl:px-6">
+          <div className="col-span-7 row-span-3 px-4 xl:px-6">
             <div className="flex flex-col lg:gap-6">
               <span className="font-semibold text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl leading-tight">
                 {fetchedProduct.title}
@@ -671,33 +667,35 @@ const ProductPage = () => {
           </div>
         </div>
 
-        <div className="lg:hidden grid grid-cols-6 grid-rows-auto grid-rows-2 sm:grid-rows-3 gap-4">
-          {fetchedProduct.images?.map((image, index) => {
-            const isLargeImage = index === 0;
-            const spanClass = isLargeImage
-              ? "col-span-6 row-span-1 h-fit border"
-              : "col-span-2 row-span-1 h-fit border";
+        <div className="2xl:hidden grid grid-cols-6 lg:grid-cols-8 grid-rows-auto gap-4">
+          <div className="col-span-6 lg:col-span-3 grid grid-cols-3 gap-4">
+            {fetchedProduct.images?.map((image, index) => {
+              const isLargeImage = index === 0;
+              const spanClass = isLargeImage
+                ? "col-span-3 h-fit border"
+                : "col-span-1 h-fit border";
 
-            return (
-              <div
-                key={index}
-                className={`${spanClass} w-fit h-fit rounded-3xl overflow-hidden hover:border hover:border-black cursor-pointer`}
-              >
-                <StorageImage
-                  alt={`image-${index}`}
-                  path={image}
-                  className={
-                    index === 0
-                      ? "object-cover aspect-square h-fit"
-                      : "object-cover h-fit"
-                  }
-                />
-              </div>
-            );
-          })}
+              return (
+                <div
+                  key={index}
+                  className={`${spanClass} w-fit h-fit rounded-3xl overflow-hidden hover:border hover:border-black cursor-pointer`}
+                >
+                  <StorageImage
+                    alt={`image-${index}`}
+                    path={image}
+                    className={
+                      index === 0
+                        ? "object-cover aspect-square h-fit"
+                        : "object-cover h-fit"
+                    }
+                  />
+                </div>
+              );
+            })}
+          </div>
 
-          <div className="col-span-6">
-            <div className="flex flex-col gap-6">
+          <div className="col-span-6 lg:col-span-5">
+            <div className="flex flex-col gap-4 ">
               <span className="font-semibold text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl leading-tight">
                 {fetchedProduct.title}
               </span>
@@ -756,7 +754,7 @@ const ProductPage = () => {
                 </Button>
               </div>
 
-              <div className="text-base sm:text-lg lg:text-base xl:text-xl text-[#7c7b7b] border-0 border-b pb-6">
+              <div className="text-base sm:text-lg lg:text-base xl:text-xl text-[#7c7b7b] border-0 border-b pb-4">
                 {fetchedProduct.description}
               </div>
 
@@ -765,7 +763,7 @@ const ProductPage = () => {
                 <div className="text-base sm:text-lg lg:text-base xl:text-xl text-[#7c7b7b]">
                   Select Colors
                 </div>
-                <div className="flex border-0 border-b gap-4 pb-6">
+                <div className="flex border-0 border-b gap-4 pb-4">
                   {fetchedProduct.colors?.map((color, index) => (
                     <div
                       key={index}
@@ -783,10 +781,10 @@ const ProductPage = () => {
 
               {/* Size Selection */}
               <div className="flex flex-col gap-3">
-                <div className="text-base sm:text-lg lg:text-base lg:text-xl text-[#7c7b7b]">
+                <div className="text-base sm:text-lg lg:text-base xl:text-xl text-[#7c7b7b]">
                   Choose Size
                 </div>
-                <div className="flex flex-wrap border-0 border-b gap-4 pb-6">
+                <div className="flex flex-wrap border-0 border-b gap-4 pb-4">
                   {fetchedProduct.sizes?.map((size, index) => (
                     <button
                       key={index}
@@ -806,14 +804,14 @@ const ProductPage = () => {
               <div className="flex gap-4">
                 <div className="flex bg-[#f0f0f0] rounded-full">
                   <button
-                    className="py-2 xl:py-2 px-4 rounded-l-full"
+                    className="px-4 py-2 rounded-l-full"
                     onClick={handleDecrement}
                   >
                     <MinusOutlined />
                   </button>
                   <div className="px-4 z-20 flex items-center">{count}</div>
                   <button
-                    className="py-2 xl:py-2 px-4 rounded-r-full"
+                    className="px-4 py-2 rounded-r-full"
                     onClick={handleIncrement}
                   >
                     <PlusOutlined />
@@ -824,7 +822,7 @@ const ProductPage = () => {
                   color="default"
                   variant="solid"
                   shape="round"
-                  className="w-full py-6 text-lg"
+                  className="w-full p-5 xl:p-6 text-lg"
                   onClick={addToCart}
                 >
                   Add to Cart
@@ -886,7 +884,7 @@ const ProductPage = () => {
                   </Dropdown>
 
                   <button
-                    className="w-full lg:w-40 2xl:w-52 py-2 text-base md:text-lg rounded-full bg-black text-white hover:bg-gray-800"
+                    className="w-full px-6 py-2 !text-base md:text-lg rounded-full bg-black text-white hover:bg-gray-800 flex flex-nowrap"
                     onClick={showModal}
                   >
                     Write a Review
@@ -999,7 +997,7 @@ const ProductPage = () => {
           )}
         </div>
 
-        <div className="flex flex-col gap-6 md:hidden">
+        <div className="flex flex-col gap-6 md:hidden border-0 border-t py-10">
           <div className="flex flex-col md:flex-row gap-6 justify-between">
             <div className="text-xl sm:text-2xl xl:text-3xl flex gap-4 items-end">
               All Reviews

@@ -6,6 +6,7 @@ import { Outlet } from "react-router-dom";
 import { Breadcrumb, Spin } from "antd";
 import { getCurrentUser } from "aws-amplify/auth";
 import { v4 as uuid } from "uuid";
+import { ProductProvider } from "../../context/productContext/productContext";
 
 const capitalize = (str) => {
   if (!str) return "";
@@ -62,7 +63,7 @@ const Layout = () => {
   }
 
   return (
-    <>
+    <ProductProvider>
       <Navbar />
       {!isHomePage && (
         <Breadcrumb
@@ -72,7 +73,7 @@ const Layout = () => {
       )}
       <Outlet />
       <Footer />
-    </>
+    </ProductProvider>
   );
 };
 

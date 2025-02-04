@@ -4,6 +4,6 @@
 
 @layer base {
   html {
-    @apply font-abeezee select-none;
+    @apply !font-abeezee !select-none;
   }
 }

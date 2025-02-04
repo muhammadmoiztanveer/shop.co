@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import HomePageImage from "@/assets/main.png";
 import smallSparkle from "@/assets/small-sparkle.png";
 import bigSparkle from "@/assets/big-sparkle.png";
@@ -25,10 +25,13 @@ import { fetchTopRatedProducts, listReviews } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import ProductCards from "../../components/productCards/productCards";
 import { v4 as uuid } from "uuid";
+import { ProductContext } from "../../context/productContext/productContext";
 
 const HomePage = () => {
   const client = generateClient();
   const navigate = useNavigate();
+
+  const { refreshProducts } = useContext(ProductContext);
 
   const [loadingNewArrivals, setLoadingNewArrivals] = useState(false);
   const [newArrivals, setNewArrivals] = useState([]);
@@ -45,16 +48,21 @@ const HomePage = () => {
   const totalReviews = fetchedReviews.length;
   const reviewsToShow = fetchedReviews.length > 0 ? fetchedReviews : [];
 
+  useEffect(() => {
+    fetchNewArrivals();
+    fetchTopRated();
+  }, [refreshProducts]);
+
   const goToPrevious = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex(currentIndex === 0 ? totalReviews - 1 : currentIndex - 1);
+    setCurrentIndex(currentIndex === 0 ? totalReviews - 2 : currentIndex - 2);
   };
 
   const goToNext = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex(currentIndex === totalReviews ? 1 : currentIndex + 1);
+    setCurrentIndex(currentIndex === totalReviews ? 2 : currentIndex + 2);
   };
 
   useEffect(() => {
@@ -85,7 +93,7 @@ const HomePage = () => {
 
       const { allProducts } = lambdaResponse.data.fetchTopRatedProducts;
 
-      if (newArrivalsResponse?.data?.listProducts?.items) {
+      if (newArrivalsResponse?.data?.listProducts?.items.length > 0) {
         const updatedNewArrivals =
           newArrivalsResponse.data.listProducts.items.map((product) => {
             const productRating = allProducts.find(
@@ -95,6 +103,16 @@ const HomePage = () => {
             return {
               ...product,
               averageRating: productRating || null,
+            };
+          });
+
+        setNewArrivals(updatedNewArrivals);
+      } else {
+        const updatedNewArrivals =
+          newArrivalsResponse.data.listProducts.items.map((product) => {
+            return {
+              ...product,
+              averageRating: 0,
             };
           });
 
@@ -118,17 +136,25 @@ const HomePage = () => {
       const { topRatedProducts, allProducts } =
         lambdaResponse.data.fetchTopRatedProducts;
 
+      console.log("toprated oproducts", topRatedProducts);
+
       if (topRatedProducts.length > 0) {
+        const filter = {
+          or: topRatedProducts.map((product) => ({
+            id: { eq: product.productID },
+          })),
+        };
+
+        console.log("filtersss", filter);
+
         const topRatedResponse = await client.graphql({
           query: listProducts,
           variables: {
-            filter: {
-              or: topRatedProducts.map((product) => ({
-                id: { eq: product.productID },
-              })),
-            },
+            filter,
           },
         });
+
+        console.log("topRated Products Resposne", topRatedResponse);
 
         if (topRatedResponse?.data?.listProducts?.items) {
           const updatedTopRated = topRatedResponse.data.listProducts.items.map(
@@ -143,6 +169,34 @@ const HomePage = () => {
               };
             }
           );
+
+          console.log("updatedTopRatedProductsss", updatedTopRated);
+
+          setTopRated(updatedTopRated);
+        }
+      } else {
+        console.log("hello");
+        const topRatedResponse = await client.graphql({
+          query: listProducts,
+          variables: {
+            limit: 4,
+          },
+        });
+
+        console.log("topRated Products Resposne", topRatedResponse);
+
+        if (topRatedResponse?.data?.listProducts?.items) {
+          const updatedTopRated = topRatedResponse.data.listProducts.items.map(
+            (product) => {
+              return {
+                ...product,
+                averageRating: 0,
+              };
+            }
+          );
+
+          console.log("updatedTopRatedProductsss", updatedTopRated);
+
           setTopRated(updatedTopRated);
         }
       }
@@ -152,6 +206,10 @@ const HomePage = () => {
       setLoadingTopRated(false);
     }
   };
+
+  useEffect(() => {
+    console.log("topRated State chnage", topRated);
+  }, [topRated]);
 
   const fetchTopReviews = async (limit = 20) => {
     setLoadingReviews(true);
@@ -163,7 +221,6 @@ const HomePage = () => {
           filter: {
             rating: { eq: 5 },
           },
-          limit: limit,
         },
       });
 
@@ -469,7 +526,7 @@ const HomePage = () => {
                               key={uuid()}
                               style={{
                                 color:
-                                  i < Math.round(review.rating)
+                                  i < Math.round(review?.rating || 0)
                                     ? "#ffca43"
                                     : "#e4e4e4",
                                 fontSize: "25px",
@@ -482,15 +539,15 @@ const HomePage = () => {
                         />
                       </div>
                       <div className="flex gap-2">
-                        User {review.userID?.substring(0, 6)}...
+                        User {review?.userID?.substring(0, 6)}...
                         <CheckCircleFilled
                           style={{ color: "#42c066", fontSize: "25px" }}
                         />
                       </div>
-                      <div className="text-gray-700">{review.comment}</div>
+                      <div className="text-gray-700">{review?.comment}</div>
                       <div className="text-gray-500 text-sm">
                         Posted on{" "}
-                        {new Date(review.createdAt).toLocaleDateString(
+                        {new Date(review?.createdAt).toLocaleDateString(
                           "en-US",
                           {
                             month: "long",

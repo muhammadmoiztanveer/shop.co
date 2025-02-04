@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const MultiColorPicker = ({ onColorChange }) => {
+const MultiColorPicker = ({ onColorChange, reset }) => {
   const [selectedColors, setSelectedColors] = useState([]);
   const [currentColor, setCurrentColor] = useState("#000000");
   const [pickerVisible, setPickerVisible] = useState(false);
@@ -9,12 +9,20 @@ const MultiColorPicker = ({ onColorChange }) => {
     if (!selectedColors.includes(currentColor)) {
       setSelectedColors([...selectedColors, currentColor]);
     }
-    setPickerVisible(false); // Close the picker after selection
+    setPickerVisible(false);
   };
 
   const removeColor = (color) => {
     setSelectedColors(selectedColors.filter((c) => c !== color));
   };
+
+  useEffect(() => {
+    if (reset) {
+      setSelectedColors([]);
+      setCurrentColor("#000000");
+      setPickerVisible(false);
+    }
+  }, [reset]);
 
   useEffect(() => {
     onColorChange(selectedColors); // Notify the parent component
