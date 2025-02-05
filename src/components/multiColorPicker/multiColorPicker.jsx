@@ -1,32 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
-const MultiColorPicker = ({ onColorChange, reset }) => {
+const MultiColorPicker = ({ onColorChange, getProductColors }) => {
   const [selectedColors, setSelectedColors] = useState([]);
   const [currentColor, setCurrentColor] = useState("#000000");
   const [pickerVisible, setPickerVisible] = useState(false);
 
-  const addColor = () => {
+  // Initialize selectedColors with getProductColors
+  useEffect(() => {
+    if (Array.isArray(getProductColors)) {
+      setSelectedColors(getProductColors);
+    }
+  }, [getProductColors]);
+
+  // Add a new color
+  const addColor = useCallback(() => {
     if (!selectedColors.includes(currentColor)) {
-      setSelectedColors([...selectedColors, currentColor]);
+      const updatedColors = [...selectedColors, currentColor];
+      setSelectedColors(updatedColors);
+      onColorChange(updatedColors); // Notify parent of the change
     }
     setPickerVisible(false);
-  };
+  }, [selectedColors, currentColor, onColorChange]);
 
-  const removeColor = (color) => {
-    setSelectedColors(selectedColors.filter((c) => c !== color));
-  };
-
-  useEffect(() => {
-    if (reset) {
-      setSelectedColors([]);
-      setCurrentColor("#000000");
-      setPickerVisible(false);
-    }
-  }, [reset]);
-
-  useEffect(() => {
-    onColorChange(selectedColors); // Notify the parent component
-  }, [selectedColors]);
+  // Remove a color
+  const removeColor = useCallback(
+    (color) => {
+      const updatedColors = selectedColors.filter((c) => c !== color);
+      setSelectedColors(updatedColors);
+      onColorChange(updatedColors); // Notify parent of the change
+    },
+    [selectedColors, onColorChange]
+  );
 
   return (
     <div className="w-full max-w-md space-y-4">
@@ -70,10 +74,8 @@ const MultiColorPicker = ({ onColorChange, reset }) => {
               className="w-6 h-6 rounded-full border border-gray-400"
               style={{ backgroundColor: color }}
             ></div>
-
             {/* Hex Value */}
             <span className="text-sm font-medium text-gray-800">{color}</span>
-
             {/* Remove Button */}
             <button
               onClick={() => removeColor(color)}

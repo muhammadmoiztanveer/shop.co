@@ -6,7 +6,7 @@ import {
   ArrowRightOutlined,
   DeleteFilled,
 } from "@ant-design/icons";
-import { Menu, Select, Button, Slider, Spin } from "antd";
+import { Menu, Select, Button, Slider, Spin, message } from "antd";
 import "./products.css";
 import Pagination from "@/components/pagination/pagination";
 import { listProducts } from "../../graphql/queries";
@@ -15,6 +15,7 @@ import { StorageImage } from "@aws-amplify/ui-react-storage";
 import { useNavigate, useLocation } from "react-router-dom";
 import { listProductFilters } from "../../graphql/customQueries";
 import { fetchTopRatedProducts } from "../../graphql/queries";
+import { deleteProduct } from "../../graphql/mutations";
 
 const Products = () => {
   const client = generateClient();
@@ -224,7 +225,7 @@ const Products = () => {
       for (let i = 1; i < page; i++) {
         const response = await client.graphql({
           query: listProducts,
-          variables: { limit: 10 },
+          variables: { limit: 5 },
         });
         nextToken = response.data.listProducts.nextToken;
         if (!nextToken) break; // Stop if there are no more pages
@@ -233,7 +234,7 @@ const Products = () => {
       // console.log("Value",response?.data?.listProducts.items.length)
       const response = await client.graphql({
         query: listProducts,
-        variables: { limit: 10, nextToken },
+        variables: { limit: 5, nextToken },
       });
 
       const lambdaResponse = await client.graphql({
@@ -278,7 +279,7 @@ const Products = () => {
 
       // Update totalPages based on totalCount
       setTotalPages(
-        Math.ceil(fetchAllProducts.data.listProducts.items.length / 10)
+        Math.ceil(fetchAllProducts.data.listProducts.items.length / 5)
       );
     } catch (error) {
       console.error("Error fetching all products:", error);
@@ -571,84 +572,26 @@ const Products = () => {
     console.log("THE SELECTED FILTERS", selectedFilters);
   }, [selectedFilters]);
 
-  // const constructFilter = (filters) => {
-  //   const { brands, color, dressStyle, price, size } = filters;
-
-  //   // Initialize the filter object
-  //   const filter = {};
-
-  //   // Add brand filter
-  //   if (brands && Object.keys(brands).length > 0) {
-  //     filter.brand = { in: [] };
-  //     Object.values(brands).forEach((brandList) => {
-  //       filter.brand.in.push(...brandList);
-  //     });
-  //     filter.brand.in = [...new Set(filter.brand.in)]; // Remove duplicates
-  //   }
-
-  //   // Add category filter based on dress style
-  //   if (dressStyle && Object.keys(dressStyle).length > 0) {
-  //     const selectedCategories = [];
-  //     Object.values(dressStyle).forEach((categories) => {
-  //       selectedCategories.push(...categories);
-  //     });
-  //     filter.category = { in: [...new Set(selectedCategories)] }; // Remove duplicates
-  //   }
-
-  //   // Add color filter
-  //   if (color) {
-  //     filter.colors = { contains: color };
-  //   }
-
-  //   // Add price range filter
-  //   if (price && price.length === 2) {
-  //     filter.price = { between: price };
-  //   }
-
-  //   // Add size filter
-  //   if (size) {
-  //     filter.sizes = { contains: size };
-  //   }
-
-  //   return filter;
-  // };
-
-  // const listFilteredProducts = async (filters) => {
-  //   setLoading(true);
-
-  //   try {
-  //     const filter = constructFilter(filters);
-
-  //     console.log("REGENRATED FILTERS", filter);
-
-  //     const allProducts = await client.graphql({
-  //       query: listProducts,
-  //       variables: filter,
-  //     });
-
-  //     console.log("FILTEREDDDDD PRODUCTSSS", allProducts);
-
-  //     setProducts(allProducts.data.listProducts.items);
-  //   } catch (error) {
-  //     console.error("Error fetching products:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const constructFilter = (filters) => {
     const { brands, color, dressStyle, price, size } = filters;
 
-    // Initialize the filter object
-    const filter = {};
+    // Initialize the filter object with an 'and' array
+    const filter = { and: [] };
 
     // Add brand filter
     if (brands && Object.keys(brands).length > 0) {
-      filter.brand = { in: [] };
-      Object.values(brands).forEach((brandList) => {
-        filter.brand.in.push(...brandList);
+      const brandList = [];
+      Object.values(brands).forEach((brandGroup) => {
+        brandList.push(...brandGroup);
       });
-      filter.brand.in = [...new Set(filter.brand.in)]; // Remove duplicates
+      const uniqueBrands = [...new Set(brandList)]; // Remove duplicates
+
+      if (uniqueBrands.length > 0) {
+        const brandConditions = uniqueBrands.map((brand) => ({
+          brand: { eq: brand },
+        }));
+        filter.and.push({ or: brandConditions });
+      }
     }
 
     // Add category filter based on dress style
@@ -657,22 +600,29 @@ const Products = () => {
       Object.values(dressStyle).forEach((categories) => {
         selectedCategories.push(...categories);
       });
-      filter.title = { in: [...new Set(selectedCategories)] }; // Remove duplicates
+      const uniqueCategories = [...new Set(selectedCategories)]; // Remove duplicates
+
+      if (uniqueCategories.length > 0) {
+        const titleConditions = uniqueCategories.map((category) => ({
+          title: { eq: category },
+        }));
+        filter.and.push({ or: titleConditions });
+      }
     }
 
     // Add color filter
     if (color) {
-      filter.colors = { contains: color }; // Use 'contains' for list fields
+      filter.and.push({ colors: { contains: color } });
     }
 
     // Add price range filter
     if (price && price.length === 2) {
-      filter.price = { between: price }; // Use 'between' for numeric fields
+      filter.and.push({ price: { between: price } });
     }
 
     // Add size filter
     if (size) {
-      filter.sizes = { contains: size }; // Use 'contains' for list fields
+      filter.and.push({ sizes: { contains: size } });
     }
 
     return filter;
@@ -694,20 +644,8 @@ const Products = () => {
         const response = await client.graphql({
           query: listProducts,
           variables: {
-            limit: 10,
-            filter: {
-              and: [
-                {
-                  or: [
-                    { brand: { in: ["Prada"] } },
-                    { title: { in: ["jeans", "hoodies"] } },
-                  ],
-                },
-                { colors: { contains: "#eb0000" } },
-                { price: { between: [0, 100] } },
-                { sizes: { contains: "xx-small" } },
-              ],
-            },
+            limit: 5,
+            filter: filter,
             nextToken,
           },
         });
@@ -718,20 +656,8 @@ const Products = () => {
       const response = await client.graphql({
         query: listProducts,
         variables: {
-          limit: 10,
-          filter: {
-            and: [
-              {
-                or: [
-                  { brand: { in: ["Prada"] } },
-                  { title: { in: ["jeans", "hoodies"] } },
-                ],
-              },
-              { colors: { contains: "#eb0000" } },
-              { price: { between: [0, 100] } },
-              { sizes: { contains: "xx-small" } },
-            ],
-          },
+          limit: 5,
+          filter: filter,
           nextToken,
         },
       });
@@ -749,12 +675,41 @@ const Products = () => {
 
       // Update totalPages based on totalCount
       setTotalPages(
-        Math.ceil(fetchAllProducts.data.listProducts.items.length / 10)
+        Math.ceil(fetchAllProducts.data.listProducts.items.length / 5)
       );
     } catch (error) {
       console.error("Error fetching filtered products:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [isProductDeleting, setIsProductDeleting] = useState(false);
+  const [productIdBeingDeleted, setProductIdBeingDeleted] = useState("");
+
+  const handleDeleteProduct = async (productId) => {
+    setProductIdBeingDeleted(`${productId}`);
+
+    try {
+      setIsProductDeleting(true);
+      const deleteProductResponse = await client.graphql({
+        query: deleteProduct,
+        variables: {
+          input: {
+            id: `${productId}`,
+          },
+        },
+      });
+
+      console.log("deleteProductResponse", deleteProductResponse);
+      message.success("Product deleted successfully.");
+
+      listFilteredProducts(selectedFilters);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      message.error("Failed to delete product. Please try again.");
+    } finally {
+      setIsProductDeleting(false);
     }
   };
 
@@ -853,100 +808,108 @@ const Products = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-y-10 gap-x-6">
-              {products.map((product, index) => {
-                const { id, title, price, discountPercentage, images } =
-                  product;
-                const discountedPrice =
-                  price - (price * discountPercentage) / 100;
-                const imageUrl = images?.[0] || "default-image.jpg";
+              {products.length > 0 ? (
+                products.map((product, index) => {
+                  const { id, title, price, discountPercentage, images } =
+                    product;
+                  const discountedPrice =
+                    price - (price * discountPercentage) / 100;
+                  const imageUrl = images?.[0] || "default-image.jpg";
 
-                return (
-                  <div
-                    key={product.id + index}
-                    className="flex flex-col space-y-8 cursor-pointer"
-                    onClick={() => viewProduct(product.id)}
-                  >
-                    <StorageImage
-                      alt={`image-${index}`}
-                      path={product.images?.[0]}
-                      className="aspect-square rounded-3xl"
-                    />
-                    <div className="flex flex-col space-y-2">
-                      <span className="text-xl">{product.title}</span>
-                      <div className="flex items-center space-x-1">
-                        {Array.from({
-                          length: Math.floor(product.averageRating || 0),
-                        }).map((_, index) => (
-                          <StarFilled
-                            key={index}
-                            style={{ color: "#ffca43", fontSize: "25px" }}
-                          />
-                        ))}
-                        {product.averageRating % 1 !== 0 && (
-                          <StarFilled
-                            key="half"
-                            style={{ color: "#ffca43", fontSize: "25px" }}
-                            className="opacity-50"
-                          />
-                        )}
-                        {Array.from({
-                          length: 5 - Math.ceil(product.averageRating || 0),
-                        }).map((_, index) => (
-                          <StarFilled
-                            key={index + Math.floor(product.averageRating || 0)}
-                            style={{ color: "#ccc", fontSize: "25px" }}
-                          />
-                        ))}
-                        <div className="ps-4">
-                          {product.averageRating
-                            ? `${product.averageRating.toFixed(1)} / 5`
-                            : ""}
+                  return (
+                    <div
+                      key={product.id + index}
+                      className="flex flex-col space-y-8 cursor-pointer"
+                      onClick={() => viewProduct(product.id)}
+                    >
+                      <StorageImage
+                        alt={`image-${index}`}
+                        path={product.images?.[0]}
+                        className="aspect-square object-cover rounded-3xl"
+                      />
+                      <div className="flex flex-col space-y-2">
+                        <span className="text-xl">{product.title}</span>
+                        <div className="flex items-center space-x-1">
+                          {Array.from({
+                            length: Math.floor(product.averageRating || 0),
+                          }).map((_, index) => (
+                            <StarFilled
+                              key={index}
+                              style={{ color: "#ffca43", fontSize: "25px" }}
+                            />
+                          ))}
+                          {product.averageRating % 1 !== 0 && (
+                            <StarFilled
+                              key="half"
+                              style={{ color: "#ffca43", fontSize: "25px" }}
+                              className="opacity-50"
+                            />
+                          )}
+                          {Array.from({
+                            length: 5 - Math.ceil(product.averageRating || 0),
+                          }).map((_, index) => (
+                            <StarFilled
+                              key={
+                                index + Math.floor(product.averageRating || 0)
+                              }
+                              style={{ color: "#ccc", fontSize: "25px" }}
+                            />
+                          ))}
+                          <div className="ps-4">
+                            {product.averageRating
+                              ? `${product.averageRating.toFixed(1)} / 5`
+                              : ""}
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <div className="xl:text-2xl 2xl:text-3xl font-bold">
-                          $
-                          {Math.round(
-                            product.price *
-                              (1 - product.discountPercentage / 100)
+                        <div className="flex items-center space-x-4">
+                          <div className="xl:text-2xl 2xl:text-3xl font-bold">
+                            $
+                            {Math.round(
+                              product.price *
+                                (1 - product.discountPercentage / 100)
+                            )}
+                          </div>
+                          {product.discountPercentage > 0 && (
+                            <div className="flex justify-between w-full">
+                              <div className="flex items-center gap-4">
+                                <div className="xl:text-2xl 2xl:text-3xl font-bold line-through text-[#7c7b7b]">
+                                  ${product.price}
+                                </div>
+                                <Button
+                                  size="small"
+                                  color="danger"
+                                  variant="filled"
+                                  shape="round"
+                                >
+                                  -{product.discountPercentage}%
+                                </Button>
+                              </div>
+                              <span
+                                className="z-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteProduct(product.id);
+                                }}
+                              >
+                                {isProductDeleting &&
+                                product.id === productIdBeingDeleted ? (
+                                  <Spin />
+                                ) : (
+                                  <DeleteFilled className="text-2xl lg:text-3xl text-red-500" />
+                                )}
+                              </span>
+                            </div>
                           )}
                         </div>
-                        {product.discountPercentage > 0 && (
-                          <div className="flex justify-between w-full">
-                            <div className="flex items-center gap-4">
-                              <div className="xl:text-2xl 2xl:text-3xl font-bold line-through text-[#7c7b7b]">
-                                ${product.price}
-                              </div>
-                              <Button
-                                size="small"
-                                color="danger"
-                                variant="filled"
-                                shape="round"
-                              >
-                                -{product.discountPercentage}%
-                              </Button>
-                            </div>
-                            <span
-                              className="z-50"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteProduct(product.id);
-                              }}
-                            >
-                              {loading &&
-                              product.id === productIdBeingDeleted ? (
-                                <Spin />
-                              ) : (
-                                <DeleteFilled className="text-2xl lg:text-3xl text-red-500" />
-                              )}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="text-lg w-full text-center col-span-1 sm:col-span-2 xl:col-span-3">
+                  No Match Found
+                </div>
+              )}
             </div>
 
             <div className="py-6 w-full">

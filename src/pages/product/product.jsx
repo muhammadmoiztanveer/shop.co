@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { useParams, useNavigate, useFetcher } from "react-router-dom";
 import {
   StarFilled,
   MinusOutlined,
@@ -9,6 +9,7 @@ import {
   CheckCircleFilled,
   EllipsisOutlined,
   CheckOutlined,
+  EditFilled,
 } from "@ant-design/icons";
 import {
   Button,
@@ -19,12 +20,15 @@ import {
   Modal,
   Rate,
   Spin,
+  Form,
+  Input,
+  Select,
 } from "antd";
 import Draggable from "react-draggable";
 import "./product.css";
 import { StorageImage } from "@aws-amplify/ui-react-storage";
 import { generateClient } from "aws-amplify/api";
-import { createReview } from "../../graphql/mutations";
+import { createReview, updateProduct } from "../../graphql/mutations";
 import { getProduct, listProducts } from "../../graphql/queries";
 import { getCurrentUser } from "aws-amplify/auth";
 import { listReviews } from "../../graphql/queries";
@@ -33,6 +37,7 @@ import { cartsByUserID } from "../../graphql/queries";
 import { createCart } from "../../graphql/mutations";
 import { createCartItem } from "../../graphql/mutations";
 import ProductCards from "../../components/productCards/productCards";
+import MultiColorPicker from "../../components/multiColorPicker/multiColorPicker";
 
 const ProductPage = () => {
   const client = generateClient();
@@ -70,6 +75,88 @@ const ProductPage = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [isReviewPosted, setIsReviewPosted] = useState(false);
 
+  const [isEditProductModalVisible, setIsEditProductModalVisible] =
+    useState(false);
+  const [isProductEditingPending, setIsProductEditingPending] = useState(false);
+
+  const productColors = useMemo(
+    () => fetchedProduct.colors,
+    [fetchedProduct.colors]
+  );
+
+  const [errors, setErrors] = useState({});
+  const [form] = Form.useForm();
+
+  // Product sizes for the multi-select dropdown
+  const productSizes = [
+    { value: "xx-small", label: "XX-Small" },
+    { value: "x-small", label: "X-Small" },
+    { value: "small", label: "Small" },
+    { value: "medium", label: "Medium" },
+    { value: "large", label: "Large" },
+    { value: "x-large", label: "X-Large" },
+    { value: "xx-large", label: "XX-Large" },
+    { value: "3x-large", label: "3X-Large" },
+  ];
+
+  // Open the modal
+  const openEditProductModal = () => {
+    setIsEditProductModalVisible(true);
+    form.setFieldsValue(fetchedProduct); // Set form fields to match fetchProduct
+  };
+
+  // Close the modal
+  const closeEditProductModal = () => {
+    setIsEditProductModalVisible(false);
+    form.resetFields(); // Reset form fields
+    setErrors({});
+  };
+
+  // Handle input changes and update fetchProduct state
+  const handleInputChange = (field, value) => {
+    setFetchedProduct((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Validate and submit the form
+  const handleEditProduct = async () => {
+    setIsProductEditingPending(true);
+
+    try {
+      await form.validateFields(); // Validate all fields
+      console.log("Updated Product Data:", fetchedProduct); // Log or send data to API
+
+      const productUpdateDetails = {
+        id: id,
+        title: fetchedProduct.title,
+        description: fetchedProduct.description,
+        category: fetchedProduct.category,
+        brand: fetchedProduct.brand,
+        price: parseFloat(fetchedProduct.price),
+        discountPercentage: parseFloat(fetchedProduct.discountPercentage),
+        sizes: fetchedProduct.sizes,
+        colors: fetchedProduct.colors,
+        quantity: parseInt(fetchedProduct.quantity, 10),
+      };
+
+      const updateProductResponse = await client.graphql({
+        query: updateProduct,
+        variables: { input: productUpdateDetails },
+      });
+
+      console.log(
+        "update Product resposne is called here",
+        updateProductResponse
+      );
+
+      message.success("Product Data Updated successfully!");
+      closeEditProductModal();
+    } catch (error) {
+      message.error("Product Data failed to Update!");
+      console.error("Validation failed:", error);
+    } finally {
+      setIsProductEditingPending(false);
+    }
+  };
   useEffect(() => {
     if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
       setSelectedColor(fetchedProduct.colors[0]);
@@ -109,6 +196,8 @@ const ProductPage = () => {
       const productFromAll = allProducts.find(
         (product) => product.productID === fetchedProductResponse.id
       );
+
+      console.log("Products form alllll", allProducts);
 
       if (productFromAll) {
         setFetchedProduct((prev) => ({
@@ -195,7 +284,6 @@ const ProductPage = () => {
       });
 
       const allItems = reviewsResponse?.data?.listReviews?.items || [];
-
       const limitedItems = allItems.slice(0, 6);
 
       if (limitedItems) {
@@ -268,9 +356,10 @@ const ProductPage = () => {
     setLoading(false);
   }
 
-  useEffect(() => {
-    fetchRelatedProducts();
-  }, [fetchedProduct]);
+  // useEffect(() => {
+  //   fetchRelatedProducts();
+  //   console.log("fetched Product", fetchedProduct);
+  // }, [fetchedProduct]);
 
   useEffect(() => {
     if (userId) {
@@ -333,6 +422,9 @@ const ProductPage = () => {
       console.error("Error submitting review:", error);
       message.error("Failed to post review. Please try again.");
     } finally {
+      fetchFilteredReviews(6);
+      fetchProduct();
+      fetchRelatedProducts();
       setIsReviewPosted(false);
     }
   };
@@ -344,12 +436,10 @@ const ProductPage = () => {
   };
 
   const handleOk = (e) => {
-    console.log(e);
     setOpen(false);
   };
 
   const handleCancel = (e) => {
-    console.log(e);
     setOpen(false);
   };
 
@@ -503,6 +593,10 @@ const ProductPage = () => {
     );
   }
 
+  const handleProductDeleted = () => {
+    fetchRelatedProducts();
+  };
+
   return (
     <>
       {contextHolder}
@@ -531,9 +625,16 @@ const ProductPage = () => {
 
           <div className="col-span-7 row-span-3 px-4 xl:px-6">
             <div className="flex flex-col lg:gap-6">
-              <span className="font-semibold text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl leading-tight">
-                {fetchedProduct.title}
-              </span>
+              <div className="flex justify-between">
+                <div className="font-semibold text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl leading-tight">
+                  {fetchedProduct.title}
+                </div>
+
+                <EditFilled
+                  className="text-2xl xl:text-3xl text-black"
+                  onClick={openEditProductModal}
+                />
+              </div>
 
               <div className="flex items-center space-x-1">
                 {/* Render filled stars */}
@@ -696,9 +797,16 @@ const ProductPage = () => {
 
           <div className="col-span-6 lg:col-span-5">
             <div className="flex flex-col gap-4 ">
-              <span className="font-semibold text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl leading-tight">
-                {fetchedProduct.title}
-              </span>
+              <div className="flex justify-between">
+                <div className="font-semibold text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl leading-tight">
+                  {fetchedProduct.title}
+                </div>
+
+                <EditFilled
+                  className="text-2xl xl:text-3xl text-black"
+                  onClick={openEditProductModal}
+                />
+              </div>
 
               <div className="flex items-center space-x-1">
                 {/* Render filled stars */}
@@ -1127,6 +1235,7 @@ const ProductPage = () => {
             from: "product",
             category: `${fetchedProduct.category}`,
           }}
+          onProductDeleted={handleProductDeleted}
         />
       </div>
 
@@ -1187,6 +1296,210 @@ const ProductPage = () => {
             />
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        title="Edit Product"
+        centered
+        open={isEditProductModalVisible}
+        onCancel={closeEditProductModal}
+        footer={[
+          <div className="flex justify-end gap-4">
+            <Button key="cancel" onClick={closeEditProductModal}>
+              Cancel
+            </Button>
+            <div>
+              {isProductEditingPending ? (
+                <Spin />
+              ) : (
+                <Button
+                  key="submit"
+                  color="default"
+                  variant="solid"
+                  onClick={handleEditProduct}
+                >
+                  Save Changes
+                </Button>
+              )}
+            </div>
+          </div>,
+        ]}
+        width={1200}
+        className="mt-10 px-4"
+      >
+        <Form form={form} layout="vertical" initialValues={fetchedProduct}>
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+            {/* Left Column */}
+            <div className="pt-4 md:py-4 flex flex-col md:w-1/2">
+              {/* Title */}
+              <Form.Item
+                label="Product Title"
+                name="title"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the product title!",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Product title"
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                />
+              </Form.Item>
+              {/* Description */}
+              <Form.Item
+                label="Product Description"
+                name="description"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the product description!",
+                  },
+                ]}
+              >
+                <textarea
+                  className="w-full !min-h-32 border rounded-md py-2 px-3"
+                  placeholder="Product description"
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                />
+              </Form.Item>
+              {/* Category */}
+              <Form.Item
+                label="Product Category"
+                name="category"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select a product category!",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Select a category"
+                  onChange={(value) => handleInputChange("category", value)}
+                >
+                  <Select.Option value="casual">Casual</Select.Option>
+                  <Select.Option value="formal">Formal</Select.Option>
+                  <Select.Option value="party">Party</Select.Option>
+                  <Select.Option value="gym">Gym</Select.Option>
+                </Select>
+              </Form.Item>
+              {/* Brand */}
+              <Form.Item
+                label="Brand"
+                name="brand"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the product brand!",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Product brand"
+                  onChange={(e) => handleInputChange("brand", e.target.value)}
+                />
+              </Form.Item>
+              {/* Price */}
+              <Form.Item
+                label="Product Price"
+                name="price"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the product price!",
+                  },
+                ]}
+              >
+                <Input
+                  addonBefore="USD"
+                  type="number"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  onChange={(e) => handleInputChange("price", e.target.value)}
+                />
+              </Form.Item>
+            </div>
+            {/* Right Column */}
+            <div className="pb-4 md:py-4 flex flex-col gap-3 md:w-1/2">
+              {/* Discount */}
+              <Form.Item label="Discount (Optional)" name="discountPercentage">
+                <Input
+                  addonAfter="%"
+                  type="number"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  onChange={(e) =>
+                    handleInputChange("discountPercentage", e.target.value)
+                  }
+                />
+              </Form.Item>
+              {/* Sizes */}
+              <Form.Item
+                label="Product Sizes"
+                name="sizes"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select at least one product size!",
+                  },
+                ]}
+              >
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Please add product sizes"
+                  options={productSizes}
+                  onChange={(value) => handleInputChange("sizes", value)}
+                />
+              </Form.Item>
+              {/* Colors */}
+              <Form.Item
+                label="Colors Available"
+                name="colors"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select at least one color!",
+                  },
+                ]}
+              >
+                <MultiColorPicker
+                  onColorChange={(colors) => {
+                    console.log("colrs changed in the compoennt", colors);
+                    handleInputChange("colors", colors);
+                  }}
+                  getProductColors={fetchedProduct.colors}
+                />
+              </Form.Item>
+              {/* Quantity */}
+              <Form.Item
+                label="Product Quantity"
+                name="quantity"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the product quantity!",
+                  },
+                ]}
+              >
+                <Input
+                  type="number"
+                  placeholder="0"
+                  min="0"
+                  onChange={(e) =>
+                    handleInputChange("quantity", e.target.value)
+                  }
+                />
+              </Form.Item>
+            </div>
+          </div>
+        </Form>
       </Modal>
     </>
   );

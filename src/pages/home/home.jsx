@@ -81,11 +81,14 @@ const HomePage = () => {
     try {
       const newArrivalsResponse = await client.graphql({
         query: listProducts,
-        variables: {
-          limit: limit,
-          sortDirection: "DESC",
-        },
       });
+
+      newArrivalsResponse.data.listProducts.items.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      const first4NewArrivals =
+        newArrivalsResponse.data.listProducts.items.slice(0, 4);
 
       const lambdaResponse = await client.graphql({
         query: fetchTopRatedProducts,
@@ -93,28 +96,26 @@ const HomePage = () => {
 
       const { allProducts } = lambdaResponse.data.fetchTopRatedProducts;
 
-      if (newArrivalsResponse?.data?.listProducts?.items.length > 0) {
-        const updatedNewArrivals =
-          newArrivalsResponse.data.listProducts.items.map((product) => {
-            const productRating = allProducts.find(
-              (item) => item.productID === product.id
-            )?.averageRating;
+      if (first4NewArrivals.length > 0) {
+        const updatedNewArrivals = first4NewArrivals.map((product) => {
+          const productRating = allProducts.find(
+            (item) => item.productID === product.id
+          )?.averageRating;
 
-            return {
-              ...product,
-              averageRating: productRating || null,
-            };
-          });
+          return {
+            ...product,
+            averageRating: productRating || null,
+          };
+        });
 
         setNewArrivals(updatedNewArrivals);
       } else {
-        const updatedNewArrivals =
-          newArrivalsResponse.data.listProducts.items.map((product) => {
-            return {
-              ...product,
-              averageRating: 0,
-            };
-          });
+        const updatedNewArrivals = first4NewArrivals.map((product) => {
+          return {
+            ...product,
+            averageRating: 0,
+          };
+        });
 
         setNewArrivals(updatedNewArrivals);
       }
@@ -144,7 +145,7 @@ const HomePage = () => {
             id: { eq: product.productID },
           })),
         };
-
+        
         console.log("filtersss", filter);
 
         const topRatedResponse = await client.graphql({
@@ -249,6 +250,12 @@ const HomePage = () => {
   function viewProduct(id) {
     navigate(`/product/${id}`);
   }
+
+  const handleProductDeleted = () => {
+    console.log("Product deleted. Refetching data...");
+    fetchNewArrivals();
+    fetchTopRated();
+  };
 
   return (
     <div className="w-full flex flex-col">
@@ -394,6 +401,7 @@ const HomePage = () => {
         viewProduct={viewProduct}
         title="NEW ARRIVALS"
         linkState={{ from: "new-arrivals", category: "new-arrivals" }}
+        onProductDeleted={handleProductDeleted}
       />
 
       <Divider />
@@ -404,6 +412,7 @@ const HomePage = () => {
         viewProduct={viewProduct}
         title="TOP SELLING"
         linkState={{ from: "top-selling", category: "new-arrivals" }}
+        onProductDeleted={handleProductDeleted}
       />
 
       <div className="bg-[#f0f0f0] rounded-3xl mx-4 md:mx-8 xl:mx-20 2xl:mx-40 px-4 py-8 sm:p-12 xl:p-20 space-y-20">
