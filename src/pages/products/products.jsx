@@ -43,11 +43,15 @@ const Products = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
+  const [shownProductsType, setShownProductsType] = useState("Casual");
+
   useEffect(() => {
     if (location.state) {
-      const { type, value } = location.state;
+      const { key, value } = location.state;
 
-      switch (type) {
+      console.log("This is recieved here", key, value);
+
+      switch (key) {
         case "new-arrivals":
           console.log("hello");
           break;
@@ -58,7 +62,7 @@ const Products = () => {
           console.log("hello");
           break;
         case "search":
-          console.log("hello");
+          setShownProductsType(`${value}`);
           break;
         default:
           console.log("Unknown navigation type");
@@ -628,13 +632,22 @@ const Products = () => {
     return filter;
   };
 
-  const listFilteredProducts = async (filters, page = 1) => {
+  const listFilteredProducts = async (
+    typeSpecificFilters,
+    filters,
+    page = 1
+  ) => {
     setLoading(true);
 
     try {
       console.log("beforeeee converting filterss", filters);
 
-      const filter = constructFilter(filters);
+      let filter;
+
+      if (filters) {
+        filter = constructFilter(filters);
+      }
+
       let allProducts = [];
       let nextToken = null;
 
@@ -645,7 +658,7 @@ const Products = () => {
           query: listProducts,
           variables: {
             limit: 5,
-            filter: filter,
+            filter: typeSpecificFilters ? typeSpecificFilters : filter,
             nextToken,
           },
         });
@@ -768,7 +781,9 @@ const Products = () => {
         ) : (
           <div className="col-span-12 lg:col-span-8 xl:col-span-9 flex flex-col gap-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full gap-4 md:gap-0">
-              <div className="text-2xl md:text-4xl font-bold">Casual</div>
+              <div className="text-2xl md:text-4xl font-bold">
+                {shownProductsType}
+              </div>
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4 text-base sm:text-lg text-[#7c7b7b]">
                 <div>
                   Showing {currentPage}-{totalPages} of {totalCount} Products

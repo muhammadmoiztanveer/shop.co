@@ -136,27 +136,21 @@ const HomePage = () => {
 
       const { topRatedProducts, allProducts } =
         lambdaResponse.data.fetchTopRatedProducts;
-
-      console.log("toprated oproducts", topRatedProducts);
-
+      // console.log("toprated oproducts", topRatedProducts);
       if (topRatedProducts.length > 0) {
         const filter = {
           or: topRatedProducts.map((product) => ({
             id: { eq: product.productID },
           })),
         };
-        
-        console.log("filtersss", filter);
-
+        // console.log("filtersss", filter);
         const topRatedResponse = await client.graphql({
           query: listProducts,
           variables: {
             filter,
           },
         });
-
-        console.log("topRated Products Resposne", topRatedResponse);
-
+        // console.log("topRated Products Resposne", topRatedResponse);
         if (topRatedResponse?.data?.listProducts?.items) {
           const updatedTopRated = topRatedResponse.data.listProducts.items.map(
             (product) => {
@@ -170,22 +164,17 @@ const HomePage = () => {
               };
             }
           );
-
-          console.log("updatedTopRatedProductsss", updatedTopRated);
-
+          // console.log("updatedTopRatedProductsss", updatedTopRated);
           setTopRated(updatedTopRated);
         }
       } else {
-        console.log("hello");
         const topRatedResponse = await client.graphql({
           query: listProducts,
           variables: {
             limit: 4,
           },
         });
-
-        console.log("topRated Products Resposne", topRatedResponse);
-
+        // console.log("topRated Products Resposne", topRatedResponse);
         if (topRatedResponse?.data?.listProducts?.items) {
           const updatedTopRated = topRatedResponse.data.listProducts.items.map(
             (product) => {
@@ -195,9 +184,7 @@ const HomePage = () => {
               };
             }
           );
-
-          console.log("updatedTopRatedProductsss", updatedTopRated);
-
+          // console.log("updatedTopRatedProductsss", updatedTopRated);
           setTopRated(updatedTopRated);
         }
       }
@@ -207,10 +194,6 @@ const HomePage = () => {
       setLoadingTopRated(false);
     }
   };
-
-  useEffect(() => {
-    console.log("topRated State chnage", topRated);
-  }, [topRated]);
 
   const fetchTopReviews = async (limit = 20) => {
     setLoadingReviews(true);

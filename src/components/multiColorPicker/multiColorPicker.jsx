@@ -5,29 +5,26 @@ const MultiColorPicker = ({ onColorChange, getProductColors }) => {
   const [currentColor, setCurrentColor] = useState("#000000");
   const [pickerVisible, setPickerVisible] = useState(false);
 
-  // Initialize selectedColors with getProductColors
   useEffect(() => {
     if (Array.isArray(getProductColors)) {
       setSelectedColors(getProductColors);
     }
   }, [getProductColors]);
 
-  // Add a new color
   const addColor = useCallback(() => {
     if (!selectedColors.includes(currentColor)) {
       const updatedColors = [...selectedColors, currentColor];
       setSelectedColors(updatedColors);
-      onColorChange(updatedColors); // Notify parent of the change
+      onColorChange(updatedColors);
     }
     setPickerVisible(false);
   }, [selectedColors, currentColor, onColorChange]);
 
-  // Remove a color
   const removeColor = useCallback(
     (color) => {
       const updatedColors = selectedColors.filter((c) => c !== color);
       setSelectedColors(updatedColors);
-      onColorChange(updatedColors); // Notify parent of the change
+      onColorChange(updatedColors);
     },
     [selectedColors, onColorChange]
   );

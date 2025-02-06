@@ -116,12 +116,12 @@ import { ArrowRightOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 const Pagination = ({ totalPages, currentPage, onPageChange }) => {
   const handlePageChange = (page) => {
     if (page > 0 && page <= totalPages) {
-      onPageChange(page); // Notify the parent component of the page change
+      onPageChange(page);
     }
   };
 
   const getPageNumbers = () => {
-    const range = 2; // How many page numbers before and after the current page to show
+    const range = 2;
     let pages = [];
     if (totalPages <= 7) {
       pages = Array.from({ length: totalPages }, (_, i) => i + 1);

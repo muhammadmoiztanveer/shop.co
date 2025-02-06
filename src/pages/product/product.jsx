@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { useParams, useNavigate, useFetcher } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   StarFilled,
   MinusOutlined,
@@ -38,6 +38,8 @@ import { createCart } from "../../graphql/mutations";
 import { createCartItem } from "../../graphql/mutations";
 import ProductCards from "../../components/productCards/productCards";
 import MultiColorPicker from "../../components/multiColorPicker/multiColorPicker";
+import AddReviewModal from "../../components/modals/addReviewModal/addReviewModal";
+import EditProductModal from "../../components/modals/editProductModal/editProductModal";
 
 const ProductPage = () => {
   const client = generateClient();
@@ -87,7 +89,6 @@ const ProductPage = () => {
   const [errors, setErrors] = useState({});
   const [form] = Form.useForm();
 
-  // Product sizes for the multi-select dropdown
   const productSizes = [
     { value: "xx-small", label: "XX-Small" },
     { value: "x-small", label: "X-Small" },
@@ -99,32 +100,23 @@ const ProductPage = () => {
     { value: "3x-large", label: "3X-Large" },
   ];
 
-  // Open the modal
   const openEditProductModal = () => {
     setIsEditProductModalVisible(true);
-    form.setFieldsValue(fetchedProduct); // Set form fields to match fetchProduct
+    form.setFieldsValue(fetchedProduct);
   };
 
-  // Close the modal
   const closeEditProductModal = () => {
     setIsEditProductModalVisible(false);
-    form.resetFields(); // Reset form fields
+    form.resetFields();
     setErrors({});
   };
 
-  // Handle input changes and update fetchProduct state
-  const handleInputChange = (field, value) => {
-    setFetchedProduct((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Validate and submit the form
   const handleEditProduct = async () => {
     setIsProductEditingPending(true);
 
     try {
-      await form.validateFields(); // Validate all fields
-      console.log("Updated Product Data:", fetchedProduct); // Log or send data to API
-
+      await form.validateFields();
+      // console.log("Updated Product Data:", fetchedProduct);
       const productUpdateDetails = {
         id: id,
         title: fetchedProduct.title,
@@ -142,12 +134,10 @@ const ProductPage = () => {
         query: updateProduct,
         variables: { input: productUpdateDetails },
       });
-
-      console.log(
-        "update Product resposne is called here",
-        updateProductResponse
-      );
-
+      // console.log(
+      //   "update Product resposne is called here",
+      //   updateProductResponse
+      // );
       message.success("Product Data Updated successfully!");
       closeEditProductModal();
     } catch (error) {
@@ -157,6 +147,7 @@ const ProductPage = () => {
       setIsProductEditingPending(false);
     }
   };
+  
   useEffect(() => {
     if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
       setSelectedColor(fetchedProduct.colors[0]);
@@ -196,9 +187,7 @@ const ProductPage = () => {
       const productFromAll = allProducts.find(
         (product) => product.productID === fetchedProductResponse.id
       );
-
-      console.log("Products form alllll", allProducts);
-
+      // console.log("Products form alllll", allProducts);
       if (productFromAll) {
         setFetchedProduct((prev) => ({
           ...prev,
@@ -212,8 +201,8 @@ const ProductPage = () => {
 
   const fetchRelatedProducts = async () => {
     const productCategory = fetchedProduct?.category;
-    console.log("§Product Category", productCategory);
-    console.log("Product ID", id);
+    // console.log("§Product Category", productCategory);
+    // console.log("Product ID", id);
 
     if (!productCategory || !id) return;
 
@@ -228,8 +217,6 @@ const ProductPage = () => {
           },
         },
       });
-
-      // console.log("Related Products Response", relatedProductsResponse);
 
       if (relatedProductsResponse?.data?.listProducts?.items) {
         const relatedProducts = relatedProductsResponse.data.listProducts.items;
@@ -307,7 +294,6 @@ const ProductPage = () => {
           variables: {
             filter: {
               productID: { eq: `${id}` },
-              // userID: { eq: `${userId ?? ""}` },
             },
           },
         });
@@ -316,10 +302,7 @@ const ProductPage = () => {
           setFetchedReviews(reviewsResponse.data.listReviews.items);
         }
 
-        // If no nextToken is returned, all reviews have been fetched
-        // if (!reviewsResponse?.data?.listReviews?.nextToken) {
         setAllReviewsFetched(true);
-        // }
       } catch (error) {
         console.error("Error fetching reviews:", error);
       } finally {
@@ -337,9 +320,9 @@ const ProductPage = () => {
         userId: fetchedUserId,
         signInDetails,
       } = await getCurrentUser();
-      console.log(`The username: ${username}`);
-      console.log(`The userId: ${fetchedUserId}`);
-      console.log(`The signInDetails: ${signInDetails}`);
+      // console.log(`The username: ${username}`);
+      // console.log(`The userId: ${fetchedUserId}`);
+      // console.log(`The signInDetails: ${signInDetails}`);
 
       if (fetchedUserId) {
         setUserId(fetchedUserId);
@@ -355,11 +338,6 @@ const ProductPage = () => {
 
     setLoading(false);
   }
-
-  // useEffect(() => {
-  //   fetchRelatedProducts();
-  //   console.log("fetched Product", fetchedProduct);
-  // }, [fetchedProduct]);
 
   useEffect(() => {
     if (userId) {
@@ -398,7 +376,18 @@ const ProductPage = () => {
     setRating((prev) => ({ ...prev, comment: e.target.value }));
   };
 
-  const handlePostReview = async () => {
+  const handlePostReview = async (value) => {
+    if (value.comment === "") {
+      message.error("Rating cannot be posted without comment !");
+      return;
+    }
+
+    setRating((prev) => ({
+      ...prev,
+      rating: value.rating,
+      comment: value.comment,
+    }));
+
     if (!userId) {
       console.log("User ID is not available");
       return;
@@ -417,11 +406,11 @@ const ProductPage = () => {
       });
 
       message.success("Review posted successfully!");
-      handleCancel();
     } catch (error) {
       console.error("Error submitting review:", error);
       message.error("Failed to post review. Please try again.");
     } finally {
+      handleCancel();
       fetchFilteredReviews(6);
       fetchProduct();
       fetchRelatedProducts();
@@ -429,14 +418,14 @@ const ProductPage = () => {
     }
   };
 
+  useEffect(() => {
+    console.log("Fetched reviews", fetchedReviews);
+  }, fetchedReviews);
+
   const draggleRef = useRef(null);
 
   const showModal = () => {
     setOpen(true);
-  };
-
-  const handleOk = (e) => {
-    setOpen(false);
   };
 
   const handleCancel = (e) => {
@@ -458,7 +447,7 @@ const ProductPage = () => {
   };
 
   const switchTabs = async (e) => {
-    console.log("click ", e);
+    // console.log("click ", e);
     setCurrent(e.key);
 
     if (e.key === "rating-reviews") {
@@ -487,7 +476,7 @@ const ProductPage = () => {
 
   const sortReviews = (e) => {
     message.info("Click on menu item.");
-    console.log("click", e);
+    // console.log("click", e);
   };
 
   const menuProps = {
@@ -535,9 +524,7 @@ const ProductPage = () => {
         query: cartsByUserID,
         variables: { userID: userId },
       });
-
-      console.log("existing cart table rsponse", existingCartResponse);
-
+      // console.log("existing cart table rsponse", existingCartResponse);
       let cartID;
 
       if (existingCartResponse.data.cartsByUserID.items.length > 0) {
@@ -547,9 +534,7 @@ const ProductPage = () => {
           query: createCart,
           variables: { input: { userID: userId, status: "active" } },
         });
-
-        console.log("cart response", newCartResponse);
-
+        // console.log("cart response", newCartResponse);
         cartID = newCartResponse.data.createCart.id;
       }
 
@@ -566,20 +551,11 @@ const ProductPage = () => {
           },
         },
       });
-
-      console.log("Added product to cart:", addProductToCartResponse);
-
+      // console.log("Added product to cart:", addProductToCartResponse);
       messageApi.open({
         type: "success",
         content: "Product Added to Cart !",
       });
-      // 5. If the user clicks "Buy Now", create the order from the cart items
-      // const createOrderResponse = await client.graphql({
-      //   query: createOrderMutation, // GraphQL mutation to create an order
-      //   variables: { cartID: cartID },
-      // });
-
-      // console.log("Order created successfully:", createOrderResponse);
     } catch (error) {
       console.error("Error in addToCart flow:", error);
     }
@@ -1239,66 +1215,21 @@ const ProductPage = () => {
         />
       </div>
 
-      <Modal
-        title={
-          <div
-            style={{ width: "100%", cursor: "move" }}
-            onMouseOver={() => disabled && setDisabled(false)}
-            onMouseOut={() => setDisabled(true)}
-            onFocus={() => {}}
-            onBlur={() => {}}
-          >
-            Post a Review
-          </div>
-        }
-        open={open}
+      <AddReviewModal
+        isVisible={open}
         onCancel={handleCancel}
-        footer={[
-          <Button
-            key="cancel"
-            color="default"
-            variant="outlined"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>,
-          <Button color="default" variant="solid" onClick={handlePostReview}>
-            {isReviewPosted ? "Posting..." : "Post Review"}
-          </Button>,
-        ]}
-        modalRender={(modal) => (
-          <Draggable
-            disabled={disabled}
-            bounds={bounds}
-            nodeRef={draggleRef}
-            onStart={onStart}
-          >
-            <div ref={draggleRef}>{modal}</div>
-          </Draggable>
-        )}
-        className="hidden md:block"
-      >
-        <div className="flex flex-col gap-4">
-          <Rate
-            allowHalf
-            defaultValue={rating.rating}
-            onChange={handleRatingChange}
-          />
-          <div className="flex flex-col gap-2">
-            <label htmlFor="message">Your Review</label>
-            <textarea
-              name="message"
-              id="message"
-              placeholder="Write your words here..."
-              className="border rounded-md py-2 px-3"
-              value={rating.comment}
-              onChange={handleMessageChange}
-            />
-          </div>
-        </div>
-      </Modal>
+        onReview={handlePostReview}
+        isReviewPosted={isReviewPosted}
+      />
 
-      <Modal
+      <EditProductModal
+        isVisible={isEditProductModalVisible}
+        onCancel={closeEditProductModal}
+        fetchedProduct={fetchedProduct}
+        isProductEditingPending={isProductEditingPending}
+      />
+
+      {/* <Modal
         title="Edit Product"
         centered
         open={isEditProductModalVisible}
@@ -1329,9 +1260,7 @@ const ProductPage = () => {
       >
         <Form form={form} layout="vertical" initialValues={fetchedProduct}>
           <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-            {/* Left Column */}
             <div className="pt-4 md:py-4 flex flex-col md:w-1/2">
-              {/* Title */}
               <Form.Item
                 label="Product Title"
                 name="title"
@@ -1347,7 +1276,6 @@ const ProductPage = () => {
                   onChange={(e) => handleInputChange("title", e.target.value)}
                 />
               </Form.Item>
-              {/* Description */}
               <Form.Item
                 label="Product Description"
                 name="description"
@@ -1366,7 +1294,6 @@ const ProductPage = () => {
                   }
                 />
               </Form.Item>
-              {/* Category */}
               <Form.Item
                 label="Product Category"
                 name="category"
@@ -1387,7 +1314,6 @@ const ProductPage = () => {
                   <Select.Option value="gym">Gym</Select.Option>
                 </Select>
               </Form.Item>
-              {/* Brand */}
               <Form.Item
                 label="Brand"
                 name="brand"
@@ -1403,7 +1329,6 @@ const ProductPage = () => {
                   onChange={(e) => handleInputChange("brand", e.target.value)}
                 />
               </Form.Item>
-              {/* Price */}
               <Form.Item
                 label="Product Price"
                 name="price"
@@ -1424,9 +1349,7 @@ const ProductPage = () => {
                 />
               </Form.Item>
             </div>
-            {/* Right Column */}
             <div className="pb-4 md:py-4 flex flex-col gap-3 md:w-1/2">
-              {/* Discount */}
               <Form.Item label="Discount (Optional)" name="discountPercentage">
                 <Input
                   addonAfter="%"
@@ -1439,7 +1362,7 @@ const ProductPage = () => {
                   }
                 />
               </Form.Item>
-              {/* Sizes */}
+
               <Form.Item
                 label="Product Sizes"
                 name="sizes"
@@ -1458,7 +1381,7 @@ const ProductPage = () => {
                   onChange={(value) => handleInputChange("sizes", value)}
                 />
               </Form.Item>
-              {/* Colors */}
+
               <Form.Item
                 label="Colors Available"
                 name="colors"
@@ -1477,7 +1400,7 @@ const ProductPage = () => {
                   getProductColors={fetchedProduct.colors}
                 />
               </Form.Item>
-              {/* Quantity */}
+
               <Form.Item
                 label="Product Quantity"
                 name="quantity"
@@ -1500,7 +1423,7 @@ const ProductPage = () => {
             </div>
           </div>
         </Form>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

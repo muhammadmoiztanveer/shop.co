@@ -11,8 +11,6 @@ import SigninPage from "@/pages/signin/signin";
 import SignupPage from "@/pages/signup/signup";
 import SetupPage from "@/pages/setup/setup";
 import RegistrationVerificationPage from "@/pages/verifyRegistrationOtp/verifyRegistrationOtp";
-import EmailVerificationPage from "./pages/emailVerificationPage/emailVerificationPage";
-// import AboutPage from "@/pages/about/about";
 
 import "./App.css";
 
@@ -33,11 +31,9 @@ function App() {
           <Route path="home" element={<HomePage />} />
           <Route path="product/:id" element={<ProductPage />} />
           <Route path="products" element={<ProductsPage />} />
-          {/* <Route path="about" element={<AboutPage />} /> */}
           <Route path="cart" element={<CartPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>
       </Routes>

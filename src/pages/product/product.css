@@ -12,50 +12,42 @@
   text-align: center !important;
 }
 
-/* Style the active tab */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected {
-  border-bottom-color: black !important; /* Change the border color to black */
-  color: black !important; /* Change the text color to black */
+  border-bottom-color: black !important;
+  color: black !important;
 }
 
-/* Hover state */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item:hover {
-  border-bottom-color: black !important; /* Change the border color to black */
-  color: black !important; /* Change text color on hover */
+  border-bottom-color: black !important;
+  color: black !important;
 }
 
-/* Focus state */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item:focus {
-  border-bottom-color: black !important; /* Change the border color to black */
-  color: black !important; /* Change text color on focus */
+  border-bottom-color: black !important;
+  color: black !important;
 }
 
-/* Active state */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item:active {
-  border-bottom-color: black !important; /* Change the border color to black */
-  color: black !important; /* Change text color on active */
+  border-bottom-color: black !important;
+  color: black !important;
 }
 
 .full-width-menu.ant-menu-horizontal > .ant-menu-item-selected::after {
-  border-bottom-color: black !important; /* Change the border color to black */
+  border-bottom-color: black !important;
 }
 
-/* Hover state: Hide the underline */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item:hover::after {
-  border-bottom-color: black !important; /* Hide the underline */
+  border-bottom-color: black !important;
 }
 
-/* Hover state: Change text color */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item:hover {
-  color: black !important; /* Change text color on hover */
+  color: black !important;
 }
 
-/* Focus state */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item:focus {
-  color: black !important; /* Change text color on focus */
+  color: black !important;
 }
 
-/* Active state */
 .full-width-menu.ant-menu-horizontal > .ant-menu-item:active {
-  color: black !important; /* Change text color on active */
+  color: black !important;
 }

@@ -22,20 +22,20 @@ const Layout = () => {
   async function currentAuthenticatedUser() {
     try {
       const { username, userId, signInDetails } = await getCurrentUser();
-      console.log(`The username: ${username}`);
-      console.log(`The userId: ${userId}`);
-      console.log(`The signInDetails: ${signInDetails}`);
+      // console.log(`The username: ${username}`);
+      // console.log(`The userId: ${userId}`);
+      // console.log(`The signInDetails: ${signInDetails}`);
 
       setLoading(false);
     } catch (err) {
-      console.log(err);
+      console.error("Error fecthing currentAuthenticatedUser in layout", err);
       navigate("/signin");
     }
   }
 
   useEffect(() => {
     currentAuthenticatedUser();
-    // navigate("/home")
+    // navigate("/home");
   }, []);
 
   const isHomePage = location.pathname === "/home";
