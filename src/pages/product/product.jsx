@@ -112,42 +112,44 @@ const ProductPage = () => {
   };
 
   const handleEditProduct = async () => {
-    setIsProductEditingPending(true);
+    // setIsProductEditingPending(true);
 
-    try {
-      await form.validateFields();
-      // console.log("Updated Product Data:", fetchedProduct);
-      const productUpdateDetails = {
-        id: id,
-        title: fetchedProduct.title,
-        description: fetchedProduct.description,
-        category: fetchedProduct.category,
-        brand: fetchedProduct.brand,
-        price: parseFloat(fetchedProduct.price),
-        discountPercentage: parseFloat(fetchedProduct.discountPercentage),
-        sizes: fetchedProduct.sizes,
-        colors: fetchedProduct.colors,
-        quantity: parseInt(fetchedProduct.quantity, 10),
-      };
+    // try {
+    //   await form.validateFields();
+    //   // console.log("Updated Product Data:", fetchedProduct);
+    const productUpdateDetails = {
+      id: id,
+      title: fetchedProduct.title,
+      description: fetchedProduct.description,
+      category: fetchedProduct.category,
+      brand: fetchedProduct.brand,
+      price: parseFloat(fetchedProduct.price),
+      discountPercentage: parseFloat(fetchedProduct.discountPercentage),
+      sizes: fetchedProduct.sizes,
+      colors: fetchedProduct.colors,
+      quantity: parseInt(fetchedProduct.quantity, 10),
+    };
 
-      const updateProductResponse = await client.graphql({
-        query: updateProduct,
-        variables: { input: productUpdateDetails },
-      });
-      // console.log(
-      //   "update Product resposne is called here",
-      //   updateProductResponse
-      // );
-      message.success("Product Data Updated successfully!");
-      closeEditProductModal();
-    } catch (error) {
-      message.error("Product Data failed to Update!");
-      console.error("Validation failed:", error);
-    } finally {
-      setIsProductEditingPending(false);
-    }
+    console.log("edited Product Details", productUpdateDetails);
+
+    //   const updateProductResponse = await client.graphql({
+    //     query: updateProduct,
+    //     variables: { input: productUpdateDetails },
+    //   });
+    //   // console.log(
+    //   //   "update Product resposne is called here",
+    //   //   updateProductResponse
+    //   // );
+    //   message.success("Product Data Updated successfully!");
+    //   closeEditProductModal();
+    // } catch (error) {
+    //   message.error("Product Data failed to Update!");
+    //   console.error("Validation failed:", error);
+    // } finally {
+    //   setIsProductEditingPending(false);
+    // }
   };
-  
+
   useEffect(() => {
     if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
       setSelectedColor(fetchedProduct.colors[0]);
@@ -571,6 +573,10 @@ const ProductPage = () => {
 
   const handleProductDeleted = () => {
     fetchRelatedProducts();
+  };
+
+  const onSetFetchedProduct = (field, value) => {
+    setFetchedProduct((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -1226,7 +1232,9 @@ const ProductPage = () => {
         isVisible={isEditProductModalVisible}
         onCancel={closeEditProductModal}
         fetchedProduct={fetchedProduct}
+        onSetFetchedProduct={onSetFetchedProduct}
         isProductEditingPending={isProductEditingPending}
+        onSubmit={handleEditProduct}
       />
 
       {/* <Modal

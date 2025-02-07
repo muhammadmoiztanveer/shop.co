@@ -7,12 +7,14 @@ const editProductModal = ({
   onCancel,
   isProductEditingPending,
   fetchedProduct,
+  onSetFetchedProduct,
+  onSubmit,
 }) => {
   const [errors, setErrors] = useState({});
   const [form] = Form.useForm();
 
   const handleInputChange = (field, value) => {
-    setFetchedProduct((prev) => ({ ...prev, [field]: value }));
+    onSetFetchedProduct(field, value);
   };
 
   const productSizes = [
@@ -27,7 +29,22 @@ const editProductModal = ({
   ];
 
   async function handleEditProduct() {
-    console.log("form is submitted");
+    // await form.validateFields();
+
+    // const productUpdateDetails = {
+    //   id: id,
+    //   title: fetchedProduct.title,
+    //   description: fetchedProduct.description,
+    //   category: fetchedProduct.category,
+    //   brand: fetchedProduct.brand,
+    //   price: parseFloat(fetchedProduct.price),
+    //   discountPercentage: parseFloat(fetchedProduct.discountPercentage),
+    //   sizes: fetchedProduct.sizes,
+    //   colors: fetchedProduct.colors,
+    //   quantity: parseInt(fetchedProduct.quantity, 10),
+    // };
+
+    onSubmit();
   }
 
   const openEditProductModal = () => {
